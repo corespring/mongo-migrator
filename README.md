@@ -22,3 +22,9 @@ a db in production.
 ## Installation
 
 ## Usage
+
+You call the migrator on the command line specifying the parameters to the command:
+
+    java -jar mongo-migrator-one-jar.jar migrate version_one mongodb://localhost:27017/cmd_db_test dbchanges/
+    
+(TODO - make a little shell wrapper script for this)
