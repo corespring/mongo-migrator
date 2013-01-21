@@ -1,9 +1,17 @@
 package org.corespring.log
 
+import java.util.logging.{Logger => JavaLogger, ConsoleHandler, LogRecord, Handler}
+
 object Logger extends {
 
-  def get(name:String) : com.twitter.logging.Logger = {
-    com.twitter.logging.Logger.get(name)
+  val handler = new ConsoleHandler()
+
+  //TODO: Flesh this out
+  def get(name: String): JavaLogger = {
+
+    val log = JavaLogger.getLogger(name)
+    log
   }
 
+  implicit def unwrap(a: Any): String = a.toString
 }

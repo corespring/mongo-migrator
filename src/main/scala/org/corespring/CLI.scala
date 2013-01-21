@@ -6,16 +6,22 @@ object CLI extends App {
 
   val Header =
     """
-      |mongo-mover
+      |mongo-migrator
       |-----------------------
       |helps mongo database migrations
     """.stripMargin
 
   val Usage =
     """
-      |mongo-mover migrate mongo_uri script_path_1 script_path2 ...
-      |mongo-mover rollback mongo_uri uid script_path_1 script_path2 ...
-      |mongo-mover versions mongo_uri
+      |mongo-migrator migrate [version_id], mongo_uri script_path_1 script_path2 ...
+      |params:
+      |@versionId - an arbitrary string value (eg: a git commit hash)
+      |@mongo_uri - a valid mongo uri (eg: mongodb://user:pass@server:port/db)
+      |@script_path - a relative path to a script folder
+      |
+      |mongo-migrator rollback version_id|object_id mongo_uri script_path_1 script_path2 ...
+      |
+      |mongo-migrator versions mongo_uri
       |
     """.stripMargin
 
@@ -27,14 +33,20 @@ object CLI extends App {
 
   args.toList match {
     case List() => println(Usage)
-    case action :: mongoUri :: scripts => {
+    case action :: params => {
 
       println( "action: " + action )
-      println( "mongoUri: " + mongoUri)
-      println( "scripts: " + scripts)
 
       action match {
-        case Actions.Migrate => Migrate(mongoUri, scripts).begin
+        case Actions.Migrate => {
+          params match{
+            case versionId :: mongoUri :: scripts if !versionId.startsWith("mongodb://") => {
+              Migrate(mongoUri, scripts, Some(versionId) ).begin
+            }
+            case mongoUri :: scripts => Migrate(mongoUri,scripts).begin
+            case _ => println(Usage)
+          }
+        }
         case Actions.Rollback => {
 
           println(">> rollback")

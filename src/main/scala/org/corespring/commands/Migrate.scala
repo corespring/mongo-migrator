@@ -6,7 +6,7 @@ import java.io.File
 import org.corespring.log.Logger
 
 
-class Migrate(uri: String, scriptFolders: List[String]) {
+class Migrate(uri: String, scriptFolders: List[String], versionId : Option[String] = None)  {
 
   private val log = Logger.get("Migrate")
 
@@ -21,7 +21,7 @@ class Migrate(uri: String, scriptFolders: List[String]) {
     log.info("[Migrate] -> run shell complete")
 
     if (successful)
-      Version.create(Version("hello from Migrate.begin", migration.scripts))
+      Version.create(Version(versionId, migration.scripts))
     else
       throw new RuntimeException("Migration unsuccessful")
   }
@@ -30,7 +30,7 @@ class Migrate(uri: String, scriptFolders: List[String]) {
 }
 
 object Migrate {
-  def apply(uri: String, scripts: List[String]): Migrate = {
-    new Migrate(uri, scripts)
+  def apply(uri: String, scripts: List[String], versionId : Option[String] = None): Migrate = {
+    new Migrate(uri, scripts, versionId)
   }
 }

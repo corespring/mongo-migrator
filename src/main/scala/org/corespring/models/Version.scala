@@ -8,19 +8,10 @@ import com.mongodb.casbah.MongoConnection
 import com.mongodb.casbah.query.dsl._
 import org.corespring.models.mongoContext._
 
-/*
-import org.bson.types.ObjectId
-import com.novus.salat.dao.{SalatDAO, ModelCompanion}
-import com.mongodb.casbah.commons.conversions.scala.RegisterJodaTimeConversionHelpers
-import com.mongodb.casbah.Imports._
-import com.novus.salat._
-import com.novus.salat.global._
-import com.novus.salat.annotations._
-*/
 
-case class Version(commitHash: String,
-                   dateCreated: DateTime,
+case class Version(dateCreated: DateTime,
                    scripts: List[Script],
+                   versionId: Option[String] = None,
                    id: ObjectId = new ObjectId())
 
 
@@ -32,7 +23,7 @@ object Version {
     val dao = new SalatDAO[Version, ObjectId](collection = collection) {}
   }
 
-  def apply(commitHash: String, scripts: List[Script]): Version = new Version(commitHash, new DateTime(), scripts)
+  def apply(versionId: Option[String], scripts: List[Script]): Version = new Version(new DateTime(), scripts, versionId)
 
   def dropCollection {
     Dao.collection.dropCollection()
@@ -45,7 +36,7 @@ object Version {
 
     cursor.toList match {
       case List() => {
-        val defaultCurrent = new Version("defaultCurrent", new DateTime(), List())
+        val defaultCurrent = new Version(new DateTime(), List())
         Dao.save(defaultCurrent)
         defaultCurrent
       }
@@ -55,11 +46,11 @@ object Version {
 
   def allScripts(v: Version): List[Script] = {
     val cursor = Dao.find("_id" $lte v.id)
-    val scripts = cursor.toList.map( _.scripts ).flatten
+    val scripts = cursor.toList.map(_.scripts).flatten
     scripts
   }
 
-  def currentVersionWithAllScripts : Version = {
+  def currentVersionWithAllScripts: Version = {
     val latest = currentVersion
     latest.copy(scripts = allScripts(latest))
   }

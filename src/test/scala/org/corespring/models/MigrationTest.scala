@@ -23,7 +23,7 @@ class MigrationTest extends Specification {
 
     def script(name:String) = new Script("dbchanges/" + name + ".js", "alert('" + name + "');")
 
-    def version(s:List[Script]) = new Version(commitHash = "Migration Test here", dateCreated = new DateTime(), scripts = s)
+    def version(s:List[Script]) = new Version(dateCreated = new DateTime(), scripts = s)
 
     "throw an error if there is a missing script - one" in new DbTest {
       val v = version(List(script("1")))
