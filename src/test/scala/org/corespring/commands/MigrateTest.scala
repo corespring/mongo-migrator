@@ -4,25 +4,29 @@ import org.specs2.mutable.{Specification, After}
 import com.mongodb.casbah.{MongoConnection, MongoCollection}
 import com.mongodb.casbah.commons.MongoDBObject
 import org.corespring.models.Version
+import org.corespring.helpers.DbSingleton
 
 class MigrateTest extends Specification {
 
   sequential
 
-  val Db = "dbname"
-  val mongoUri = "mongodb://localhost/" + Db
+  Version.init(DbSingleton.db)
+
   val dummyCollection = "migrateTest"
 
   object TestCollections {
-    val collection: MongoCollection = MongoConnection()(Db)(dummyCollection)
-    val orgs: MongoCollection = MongoConnection()(Db)("organizations")
-    val users: MongoCollection = MongoConnection()(Db)("users")
+    val collection: MongoCollection = DbSingleton.db(dummyCollection)
+    val orgs: MongoCollection = DbSingleton.db("organizations")
+    val users: MongoCollection = DbSingleton.db("users")
   }
 
 
   def path(n: String) = "src/test/resources/mock_files/" + n
 
   "Migrate" should {
+
+    import DbSingleton.mongoUri
+
     "do one migration" in new dbtest {
 
       import TestCollections._

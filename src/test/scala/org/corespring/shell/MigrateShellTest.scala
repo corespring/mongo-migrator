@@ -6,8 +6,11 @@ import org.corespring.commands.ScriptSlurper
 import com.mongodb.Mongo
 import com.mongodb.casbah.{MongoCollection, MongoConnection}
 import com.mongodb.casbah.commons.MongoDBObject
+import org.corespring.helpers.DbSingleton
 
 class MigrateShellTest extends Specification {
+
+  Version.init(DbSingleton.db)
 
   val collection: MongoCollection = MongoConnection()("dbname")("mongo_migration_test")
 

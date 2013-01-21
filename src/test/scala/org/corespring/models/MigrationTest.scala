@@ -3,11 +3,13 @@ package org.corespring.models
 import org.specs2.mutable.{Specification, After}
 import org.joda.time.DateTime
 import org.corespring.exceptions.MigrationException
-import org.corespring.helpers.DbTest
+import org.corespring.helpers.{DbSingleton, DbTest}
 
 class MigrationTest extends Specification {
 
   sequential
+
+  Version.init(DbSingleton.db)
 
   "Migration" should {
 

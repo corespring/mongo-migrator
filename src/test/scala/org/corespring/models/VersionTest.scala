@@ -1,10 +1,11 @@
 package org.corespring.models
 
-import org.specs2.mutable.{Before, Specification, After}
+import org.specs2.mutable.Specification
 import org.joda.time.DateTime
-import com.mongodb.casbah.commons.MongoDBObject
-import org.corespring.helpers.DbTest
+import org.corespring.helpers.{DbSingleton, DbTest}
 import org.corespring.log.Logger
+import com.mongodb.casbah.MongoConnection
+import com.mongodb.casbah.MongoDB
 
 class VersionTest extends Specification {
 
@@ -22,9 +23,12 @@ class VersionTest extends Specification {
       log.fine("debug- 1")
     }
 
+    Version.init(DbSingleton.db)
+
     def s = scala.Math.random.toString
 
     "return the current version" in /*new DbTest*/ {
+
       Version.dropCollection
       create(new DateTime(), List(), s)
       create(new DateTime(), List(), s)
@@ -38,7 +42,7 @@ class VersionTest extends Specification {
 
     def version(d: DateTime, s: List[Script], v: String): Version = new Version(d, s, Some(v))
 
-    def create(d:DateTime, s: List[Script], v: String) = Version.create(version(d,s,v))
+    def create(d: DateTime, s: List[Script], v: String) = Version.create(version(d, s, v))
 
     "returns all scripts run" in new DbTest {
 

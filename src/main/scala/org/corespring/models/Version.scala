@@ -17,9 +17,18 @@ case class Version(dateCreated: DateTime,
 
 object Version {
 
-  private object Dao extends ModelCompanion[Version, ObjectId] {
+  lazy val Dao = new Dao(db)
+
+  private var db : MongoDB = null
+
+  def init(db:MongoDB) = {
+    this.db = db
+  }
+
+
+  class Dao(db:MongoDB) extends ModelCompanion[Version, ObjectId] {
     RegisterJodaTimeConversionHelpers()
-    val collection = MongoConnection()("dbname")("mongo_migrator_versions")
+    val collection = db("mongo_migrator_versions")
     val dao = new SalatDAO[Version, ObjectId](collection = collection) {}
   }
 

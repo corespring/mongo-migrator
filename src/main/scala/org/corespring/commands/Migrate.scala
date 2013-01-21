@@ -4,6 +4,7 @@ import org.corespring.models.{DBName, Version, Migration}
 import org.corespring.shell.MigrateShell
 import java.io.File
 import org.corespring.log.Logger
+import com.mongodb.casbah.{MongoURI, MongoDB, MongoConnection}
 
 
 class Migrate(uri: String, scriptFolders: List[String], versionId : Option[String] = None)  {
@@ -12,6 +13,9 @@ class Migrate(uri: String, scriptFolders: List[String], versionId : Option[Strin
 
   def begin = {
     backup
+
+    connectAndInit
+
     val currentVersion = Version.currentVersionWithAllScripts
     val scripts = ScriptSlurper.scriptsFromPaths(scriptFolders)
     val migration = Migration(currentVersion, scripts)
@@ -26,7 +30,15 @@ class Migrate(uri: String, scriptFolders: List[String], versionId : Option[Strin
       throw new RuntimeException("Migration unsuccessful")
   }
 
-  def backup = println("backup: " + uri)
+
+  private def connectAndInit {
+    val connection : MongoConnection = MongoConnection(MongoURI(uri))
+    val dbName : DBName = DBName(uri)
+    val db : MongoDB = connection(dbName.db)
+    Version.init(db)
+  }
+
+  def backup = log.info("TODO: backup: " + uri + " not a top priority as we can do this externally for now")
 }
 
 object Migrate {
