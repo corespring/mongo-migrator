@@ -3,9 +3,12 @@ package org.corespring.commands
 import org.corespring.models.{DBName, Version, Migration}
 import org.corespring.shell.MigrateShell
 import java.io.File
+import org.corespring.log.Logger
+
 
 class Migrate(uri: String, scriptFolders: List[String]) {
 
+  private val log = Logger.get("Migrate")
 
   def begin = {
     backup
@@ -13,9 +16,9 @@ class Migrate(uri: String, scriptFolders: List[String]) {
     val scripts = ScriptSlurper.scriptsFromPaths(scriptFolders)
     val migration = Migration(currentVersion, scripts)
     val dbName = DBName(uri)
-    println("[Migrate] -> run shell")
+    log.info("[Migrate] -> run shell")
     val successful = MigrateShell.run(dbName, migration)
-    println("[Migrate] -> run shell complete")
+    log.info("[Migrate] -> run shell complete")
 
     if (successful)
       Version.create(Version("hello from Migrate.begin", migration.scripts))

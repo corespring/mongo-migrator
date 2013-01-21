@@ -3,7 +3,8 @@ scalaVersion := "2.9.2"
 libraryDependencies ++= Seq(
   "org.mongodb" %% "casbah" % "2.4.1",
   "org.specs2" %% "specs2" % "1.12.2" % "test",
-   "com.novus" %% "salat" % "1.9.1"
+   "com.novus" %% "salat" % "1.9.1",
+   "com.twitter"  %% "util-logging"   % "6.0.5"
   )
 
 resolvers ++= Seq(
@@ -15,3 +16,4 @@ resolvers ++= Seq(
   "repo.novus rels" at "http://repo.novus.com/releases/",
   "repo.novus snaps" at "http://repo.novus.com/snapshots/"
 )
+

@@ -7,6 +7,8 @@ import org.corespring.helpers.DbTest
 
 class MigrationTest extends Specification {
 
+  sequential
+
   "Migration" should {
 
     "correctly remove scripts that have already been applied to the current version" in new DbTest {
