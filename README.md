@@ -1,4 +1,5 @@
-mongo-migrator
-==============
+A sample for the Typesafe Stack (http://typesafe.com/stack).
 
-a command line utility for migrating a mongo db
+Scala sample project using Scala and SBT.
+
+To run and test it use SBT invoke: 'sbt run'
