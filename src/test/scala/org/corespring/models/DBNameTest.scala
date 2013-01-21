@@ -2,9 +2,9 @@ package org.corespring.models
 
 import org.specs2.mutable.Specification
 
-class DBNameTest extends Specification {
+class DbNameTest extends Specification {
 
-  "DBName" should {
+  "DbName" should {
 
     def assertParse(
                      uri:String,
@@ -14,7 +14,7 @@ class DBNameTest extends Specification {
                      username:Option[String] = None,
                      password:Option[String] = None) = {
 
-      val dbName = DBName(uri)
+      val dbName = DbName(uri)
       dbName.host === host
       dbName.port === port
       dbName.db === db

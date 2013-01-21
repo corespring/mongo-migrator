@@ -1,12 +1,13 @@
 package org.corespring.commands
 
-import org.corespring.models.{DBName, Version, Migration}
+import org.corespring.models.{DbName, Version, Migration}
 import org.corespring.shell.MigrateShell
 import org.corespring.log.Logger
 import com.mongodb.casbah.{MongoURI, MongoDB, MongoConnection}
 
 
-class Migrate(uri: String, scriptFolders: List[String], versionId : Option[String] = None)  {
+class Migrate(uri: String, scriptFolders: List[String], versionId : Option[String] = None)
+extends BaseCommand(uri){
 
   private val log = Logger.get("Migrate")
 
@@ -24,9 +25,9 @@ class Migrate(uri: String, scriptFolders: List[String], versionId : Option[Strin
         case List() => log.info("no scripts to run - up to date")
         case _ => {
 
-          val dbName = DBName(uri)
+          val dbName = DbName(uri)
           log.info("[Migrate] -> run shell")
-          val successful = MigrateShell.run(dbName, migration)
+          val successful = MigrateShell.run(dbName, migration.scripts.map(_.up))
           log.info("[Migrate] -> run shell complete")
 
           if (successful)
@@ -37,16 +38,6 @@ class Migrate(uri: String, scriptFolders: List[String], versionId : Option[Strin
         }
       }
     }
-  }
-
-
-  private def withDb( fn : (MongoDB => Unit) ){
-    val connection : MongoConnection = MongoConnection(MongoURI(uri))
-    val dbName : DBName = DBName(uri)
-    val db : MongoDB = connection(dbName.db)
-    Version.init(db)
-    fn(db)
-    connection.close()
   }
 
   def backup = log.info("TODO: backup: " + uri + " not a top priority as we can do this externally for now")

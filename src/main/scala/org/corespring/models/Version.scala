@@ -17,16 +17,15 @@ case class Version(dateCreated: DateTime,
 
 object Version {
 
-  lazy val Dao = new Dao(db)
+  private lazy val Dao = new Dao(db)
 
-  private var db : MongoDB = null
+  private var db: MongoDB = null
 
-  def init(db:MongoDB) = {
+  def init(db: MongoDB) = {
     this.db = db
   }
 
-
-  class Dao(db:MongoDB) extends ModelCompanion[Version, ObjectId] {
+  class Dao(db: MongoDB) extends ModelCompanion[Version, ObjectId] {
     RegisterJodaTimeConversionHelpers()
     val collection = db("mongo_migrator_versions")
     val dao = new SalatDAO[Version, ObjectId](collection = collection) {}
@@ -70,4 +69,24 @@ object Version {
   }
 
   def count(dbo: DBObject): Long = Dao.count(dbo)
+
+  def list(): List[Version] = Dao.findAll().toList
+
+  def findById(id: String): Option[Version] = {
+    try {
+      val objectId = new ObjectId(id)
+      Dao.findOneById(objectId)
+    }
+    catch {
+      case e: Throwable => None
+    }
+  }
+
+  def findByVersionId(versionId: String): Option[Version] = Dao.findOne(MongoDBObject("versionId" -> versionId))
+
+  def findVersionsLaterThan(v: Version): List[Version] = Dao.find("_id" $gt v.id).toList
+
+  def remove(v: Version) {
+    Dao.remove(v)
+  }
 }

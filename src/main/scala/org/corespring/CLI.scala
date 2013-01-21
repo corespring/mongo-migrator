@@ -1,6 +1,6 @@
 package org.corespring
 
-import commands.Migrate
+import commands.{Versions, Migrate, Rollback}
 
 object CLI extends App {
 
@@ -25,7 +25,7 @@ object CLI extends App {
       |
     """.stripMargin
 
-  object Actions{
+  object Actions {
     val Migrate = "migrate"
     val Rollback = "rollback"
     val Versions = "versions"
@@ -35,35 +35,29 @@ object CLI extends App {
     case List() => println(Usage)
     case action :: params => {
 
-      println( "action: " + action )
+      println("action: " + action)
 
       action match {
         case Actions.Migrate => {
-          params match{
+          params match {
             case versionId :: mongoUri :: scripts if !versionId.startsWith("mongodb://") => {
-              Migrate(mongoUri, scripts, Some(versionId) ).begin
+              Migrate(mongoUri, scripts, Some(versionId)).begin
             }
-            case mongoUri :: scripts => Migrate(mongoUri,scripts).begin
+            case mongoUri :: scripts => Migrate(mongoUri, scripts).begin
             case _ => println(Usage)
           }
         }
         case Actions.Rollback => {
-
-          println(">> rollback")
-
+          params match {
+            case targetId :: mongoUri :: scripts => Rollback(targetId, mongoUri, scripts).begin
+            case _ => println(Usage)
+          }
         }
-        case Actions.Versions => {
-          println(">> versions")
-
-        }
+        case Actions.Versions => Versions(params.head).begin
         case _ => println(Usage)
       }
 
     }
-
-
     case _ => println(Usage)
   }
-
-
 }

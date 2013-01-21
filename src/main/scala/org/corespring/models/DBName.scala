@@ -1,20 +1,30 @@
 package org.corespring.models
 
-case class DBName(
+case class DbName(
                    host: String,
                    port: String,
                    db: String,
                    username: Option[String] = None,
-                   password: Option[String] = None)
+                   password: Option[String] = None){
 
-object DBName {
+  def toCmdLine() : String = {
+    List(
+      Some("mongo"),
+      Some(host + ":" + port + "/" + db),
+      username.map("-u " + _),
+      password.map("-p " + _)
+    ).flatten.mkString(" ")
+  }
+}
+
+object DbName {
   def apply(uri: String) = {
 
     def parseNoUsername = {
       val NoUser = """mongodb://(.*)/(.*)""".r
       val NoUser(hostPort, dbname) = uri
       val (host, port) = getHostPort(hostPort)
-      new DBName(host, port, dbname)
+      new DbName(host, port, dbname)
     }
 
     def parseUsername = {
@@ -22,7 +32,7 @@ object DBName {
       val UserRegex(userPass, hostPort, dbname) = uri
       val (host, port) = getHostPort(hostPort)
       val (user, pass) = getUserPass(userPass)
-      new DBName(host, port, dbname, Some(user), Some(pass))
+      new DbName(host, port, dbname, Some(user), Some(pass))
     }
 
     def getHostPort(hostPort: String): (String, String) = splitString(hostPort, hostPort, "27017")
