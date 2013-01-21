@@ -92,6 +92,23 @@ class MigrateTest extends Specification {
 
       orgs.find( MongoDBObject("city" -> "New York")).length === 2
     }
+
+    "don't run if there are now scripts to run" in {
+
+      import TestCollections._
+
+      val firstCmd = new Migrate(mongoUri, List(path("/migrate/one")))
+      firstCmd.begin
+      val firstRunVersion = Version.currentVersion
+
+      val secondCmd = new Migrate(mongoUri, List(path("/migrate/one")))
+      secondCmd.begin
+
+      val secondRunVersion = Version.currentVersion
+
+      firstRunVersion === secondRunVersion
+
+    }
   }
 
   trait dbtest extends After {
