@@ -30,9 +30,26 @@ What happens:
 The script inspects the db to see if any scripts have already been run from the given file folder. Any that have been run are excluded from this migration.
 The scripts are run and once complete a new version is saved with the scripts that were run.
 
+### Versions
+   
+    mongo-migrator versions mongo_uri 
+    
+Prints out the versions in this db (with a version id if you specified one)
+
 ### Rollback
 
-### Versions
+    mongo-migrator rollback version_id|object_id mongo_uri script_path_1 script_path2 ...
+
+parameters:
+
+* version_id|object_id - this can either by an arbitrary version id or an object id (you can see whats available by running versions).
+* mongo_uri - the mongo uri
+* script_path* - the relative paths to the script folder
+
+What happens: 
+
+The script finds the version specified, collates all the scripts from later versions and runs the *down* portion of each script in reverse order.
+
 
 ## Installation
 
