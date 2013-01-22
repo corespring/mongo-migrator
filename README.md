@@ -50,9 +50,19 @@ What happens:
 
 The script finds the version specified, collates all the scripts from later versions and runs the *down* portion of each script in reverse order.
 
-### Script format
-#### Up scripts
-#### Down scripts
+## Script format
+The migrator uses a simple convention to decide what is the up part of the script and what is the down part.
+If the file contains '//Down' on its own line - all lines after that are the down script, all lines before are the up script.
+If '//Down' isn't in the file - the file is assumed to be an up script only.
+
+A up and down script:
+
+    function up(a){alert('up')}
+    //Down
+    function down(a){ alert('down')}
+    
+
+
 
 
 ## Installation
