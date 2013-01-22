@@ -11,10 +11,13 @@ class MigrationTest extends Specification {
 
   Version.init(DbSingleton.db)
 
+  def script(name:String) = new Script("dbchanges/" + name + ".js", "alert('" + name + "');")
+
+  def version(s:List[Script]) = new Version(dateCreated = new DateTime(), scripts = s)
+
   "Migration" should {
 
     "correctly remove scripts that have already been applied to the current version" in new DbTest {
-
       val current = script("1")
       val newScript = script("2")
       val v = version(List(current))
@@ -22,10 +25,6 @@ class MigrationTest extends Specification {
       val newMigration = Migration(v, newScripts)
       newMigration.scripts === newScripts.tail
     }
-
-    def script(name:String) = new Script("dbchanges/" + name + ".js", "alert('" + name + "');")
-
-    def version(s:List[Script]) = new Version(dateCreated = new DateTime(), scripts = s)
 
     "throw an error if there is a missing script - one" in new DbTest {
       val v = version(List(script("1")))

@@ -15,7 +15,7 @@ class RollbackTest extends Specification {
     sequential
     Version.init(DbSingleton.db)
 
-    val testCollection : String = "test_rollback_collection"
+    val testCollection: String = "test_rollback_collection"
 
     val oneScripts = List(Script("firstName_toName.js",
       """
@@ -68,7 +68,7 @@ class RollbackTest extends Specification {
       DbSingleton.db(testCollection).insert(dbo)
     }
 
-    def createVersion(scripts:List[Script], versionId:String ) = Version.create(new Version(new DateTime(),scripts,Some(versionId)))
+    def createVersion(scripts: List[Script], versionId: String) = Version.create(new Version(new DateTime(), scripts, Some(versionId)))
 
     "rollback a single version" in new dbtidyup {
 
@@ -84,7 +84,7 @@ class RollbackTest extends Specification {
       val rollbackVersion = createVersion(oneScripts, "versionOne")
       createVersion(twoScripts, "versionTwo")
 
-      val rollback = new Rollback("versionOne", DbSingleton.mongoUri, List())
+      val rollback = Rollback("versionOne", DbSingleton.mongoUri, List() )
 
       rollback.begin
 
@@ -96,10 +96,10 @@ class RollbackTest extends Specification {
     }
 
 
-    "rollback 2 versions" in {
+    "rollback 2 versions" in new dbtidyup {
       seedDb
 
-      val scriptsToRun = List(oneScripts,twoScripts,threeScripts).flatten.map(_.up)
+      val scriptsToRun = List(oneScripts, twoScripts, threeScripts).flatten.map(_.up)
       MigrateShell.run(DbName(DbSingleton.mongoUri), scriptsToRun)
 
       val migratedDbo = DbSingleton.db(testCollection).findOne()
@@ -110,14 +110,14 @@ class RollbackTest extends Specification {
       createVersion(twoScripts, "versionTwo")
       createVersion(threeScripts, "versionThree")
 
-      new Rollback("versionOne", DbSingleton.mongoUri, List()).begin
+      Rollback("versionOne", DbSingleton.mongoUri, List()).begin
 
       rollbackVersion == Version.currentVersion
 
       val rolledBackDbo = DbSingleton.db(testCollection).findOne()
       rolledBackDbo.get.get("name") === "Ed"
 
-      new Rollback("versionZero", DbSingleton.mongoUri, List()).begin
+      Rollback("versionZero", DbSingleton.mongoUri, List()).begin
 
       val versionZeroDbo = DbSingleton.db(testCollection).findOne()
       versionZeroDbo.get.get("firstName") === "Ed"

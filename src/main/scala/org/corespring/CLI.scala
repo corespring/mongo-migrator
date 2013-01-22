@@ -1,6 +1,6 @@
 package org.corespring
 
-import commands.{Versions, Migrate, Rollback}
+import commands.{ScriptValidator, Versions, Migrate, Rollback}
 
 object CLI extends App {
 
@@ -41,15 +41,15 @@ object CLI extends App {
         case Actions.Migrate => {
           params match {
             case versionId :: mongoUri :: scripts if !versionId.startsWith("mongodb://") => {
-              Migrate(mongoUri, scripts, Some(versionId)).begin
+              Migrate(mongoUri, scripts, Some(versionId), ScriptValidator.validateContents).begin
             }
-            case mongoUri :: scripts => Migrate(mongoUri, scripts).begin
+            case mongoUri :: scripts => Migrate(mongoUri, scripts, None, ScriptValidator.validateContents).begin
             case _ => println(Usage)
           }
         }
         case Actions.Rollback => {
           params match {
-            case targetId :: mongoUri :: scripts => Rollback(targetId, mongoUri, scripts).begin
+            case targetId :: mongoUri :: scripts => Rollback(targetId, mongoUri, scripts, ScriptValidator.validateContents).begin
             case _ => println(Usage)
           }
         }

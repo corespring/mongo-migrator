@@ -1,13 +1,16 @@
 package org.corespring.commands
 
-import org.corespring.models.{DbName, Version, Migration}
+import org.corespring.models.{DbName, Version, Migration, Script}
 import org.corespring.shell.MigrateShell
 import org.corespring.log.Logger
 import com.mongodb.casbah.{MongoURI, MongoDB, MongoConnection}
 
 
-class Migrate(uri: String, scriptFolders: List[String], versionId : Option[String] = None)
-extends BaseCommand(uri){
+class Migrate(
+               uri: String,
+               scriptFolders: List[String],
+               versionId: Option[String] = None,
+               validateContents: (List[Script], List[String]) => Boolean) extends BaseCommand(uri) {
 
   private val log = Logger.get("Migrate")
 
@@ -15,28 +18,33 @@ extends BaseCommand(uri){
 
     backup
 
-    withDb{ db =>
+    withDb {
+      db =>
 
-      val currentVersion = Version.currentVersionWithAllScripts
-      val scripts = ScriptSlurper.scriptsFromPaths(scriptFolders)
-      val migration = Migration(currentVersion, scripts)
+        val currentVersion = Version.currentVersionWithAllScripts
+        val scripts = ScriptSlurper.scriptsFromPaths(scriptFolders)
+        val migration = Migration(currentVersion, scripts)
 
-      migration.scripts match {
-        case List() => log.info("no scripts to run - up to date")
-        case _ => {
+        migration.scripts match {
+          case List() => log.info("no scripts to run - up to date")
+          case _ => {
 
-          val dbName = DbName(uri)
-          log.info("[Migrate] -> run shell")
-          val successful = MigrateShell.run(dbName, migration.scripts.map(_.up))
-          log.info("[Migrate] -> run shell complete")
+            if (!validateContents(migration.scripts, scriptFolders)) {
+              throw new RuntimeException("The scripts in the db and in the files don't match")
+            }
 
-          if (successful)
-            Version.create(Version(versionId, migration.scripts))
-          else
-            throw new RuntimeException("Migration unsuccessful")
+            val dbName = DbName(uri)
+            log.info("[Migrate] -> run shell")
+            val successful = MigrateShell.run(dbName, migration.scripts.map(_.up))
+            log.info("[Migrate] -> run shell complete")
 
+            if (successful)
+              Version.create(Version(versionId, migration.scripts))
+            else
+              throw new RuntimeException("Migration unsuccessful")
+
+          }
         }
-      }
     }
   }
 
@@ -44,7 +52,14 @@ extends BaseCommand(uri){
 }
 
 object Migrate {
-  def apply(uri: String, scripts: List[String], versionId : Option[String] = None): Migrate = {
-    new Migrate(uri, scripts, versionId)
+
+  def alwaysValid(scripts: List[Script], scriptPaths: List[String]): Boolean = true
+
+  def apply(
+             uri: String,
+             scripts: List[String],
+             versionId: Option[String] = None,
+             validateContents: (List[Script], List[String]) => Boolean = alwaysValid): Migrate = {
+    new Migrate(uri, scripts, versionId, validateContents)
   }
 }
