@@ -1,0 +1,8 @@
+#!/bin/bash
+source "_base"
+
+echo "--> rollback"
+java -jar $JAR rollback v1 mongodb://localhost/tool_test_db
+
+source "_base_cleanup"
+

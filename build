@@ -1,0 +1,5 @@
+sbt test
+sbt one-jar
+cd tool-test
+./run
+./run_with_rollback
