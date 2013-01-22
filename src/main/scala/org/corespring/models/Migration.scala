@@ -27,7 +27,7 @@ object Migration {
           val currentSorted: List[Script] = currentVersion.scripts.sortWith(_.name < _.name)
           val newSorted: List[Script] = scripts.sortWith(_.name < _.name)
 
-          val difference = newSorted -- currentSorted
+          val difference = newSorted.filterNot( currentSorted.contains(_) )
           difference match {
             case List() => List()
             case head :: rest => {

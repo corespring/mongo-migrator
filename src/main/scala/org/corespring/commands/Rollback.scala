@@ -30,12 +30,17 @@ class Rollback(targetId:String,uri:String,scripts:List[String]) extends BaseComm
 
             val laterVersions : List[Version] = Version.findVersionsLaterThan(target)
 
-            def rollback:List[Script] = { List() }
+            def rollbackScripts:List[Script] = {
+              val allScripts = laterVersions.map( _.scripts ).flatten
+              val reversed = allScripts.reverse
+              val downScripts = reversed.map(_.down).flatten
+              downScripts
+            }
 
-            val success = RollbackShell.run(DbName(uri), rollback.map(_.down))
+            val success = RollbackShell.run(DbName(uri), rollbackScripts)
 
             if (success){
-             //laterVersions.map(Version.remove(_))
+             laterVersions.map(Version.remove(_))
             } else {
              println("The rollback was unsuccessful!")
             }

@@ -63,9 +63,10 @@ object Version {
     latest.copy(scripts = allScripts(latest))
   }
 
-  def create(v: Version): Unit = {
+  def create(v: Version): Version = {
     val newCurrent = v.copy(dateCreated = new DateTime())
     Dao.save(newCurrent)
+    newCurrent
   }
 
   def count(dbo: DBObject): Long = Dao.count(dbo)

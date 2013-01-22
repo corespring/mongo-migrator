@@ -25,7 +25,13 @@ class VersionTest extends Specification {
 
     Version.init(DbSingleton.db)
 
-    def s = scala.Math.random.toString
+    def s = scala.math.random.toString
+
+    def script(s: String): Script = new Script(s, s)
+
+    def version(d: DateTime, s: List[Script], v: String): Version = new Version(d, s, Some(v))
+
+    def create(d: DateTime, s: List[Script], v: String) : Version = Version.create(version(d, s, v))
 
     "return the current version" in /*new DbTest*/ {
 
@@ -38,17 +44,10 @@ class VersionTest extends Specification {
       Version.currentVersion.versionId must equalTo(Some(lastVersion))
     }
 
-    def script(s: String): Script = new Script(s, s)
-
-    def version(d: DateTime, s: List[Script], v: String): Version = new Version(d, s, Some(v))
-
-    def create(d: DateTime, s: List[Script], v: String) = Version.create(version(d, s, v))
 
     "returns all scripts run" in new DbTest {
 
       Version.dropCollection
-
-      log.info(Version.allScripts(Version.currentVersion))
 
       Version.allScripts(Version.currentVersion).length === 0
       create(new DateTime(), List(script("1")), s)
@@ -65,6 +64,26 @@ class VersionTest extends Specification {
       log.info(Version.allScripts(Version.currentVersion))
 
       Version.allScripts(Version.currentVersion).length === 5
+    }
+
+    "returns all later versions" in {
+
+      val one = create(new DateTime(), List(script("1")), s)
+      val two = create(new DateTime(), List(script("2")), s)
+      val three = create(new DateTime(), List(script("3")), s)
+      val four = create(new DateTime(), List(script("4")), s)
+      val five = create(new DateTime(), List(script("5")), s)
+      val six = create(new DateTime(), List(script("6")), s)
+
+      Version.findVersionsLaterThan(one).length === 5
+      Version.findVersionsLaterThan(one) === List(two,three,four,five,six)
+      Version.findVersionsLaterThan(one) !== List(three, two,four,five,six)
+
+      Version.findVersionsLaterThan(two).length === 4
+      Version.findVersionsLaterThan(three).length === 3
+      Version.findVersionsLaterThan(four).length === 2
+      Version.findVersionsLaterThan(five).length === 1
+      Version.findVersionsLaterThan(six).length === 0
     }
 
   }
