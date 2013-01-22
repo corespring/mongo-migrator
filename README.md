@@ -61,6 +61,9 @@ A up and down script:
     //Down
     function down(a){ alert('down')}
     
+    
+## Differences between Files and Scripts
+If when you run rollback - there is a discrepency between the script contents in the db and the script contents in the local file, the command line will fail.
 
 
 
