@@ -50,13 +50,11 @@ What happens:
 
 The script finds the version specified, collates all the scripts from later versions and runs the *down* portion of each script in reverse order.
 
+### Script format
+#### Up scripts
+#### Down scripts
+
 
 ## Installation
 
-## Usage
 
-You call the migrator on the command line specifying the parameters to the command:
-
-    java -jar mongo-migrator-one-jar.jar migrate version_one mongodb://localhost:27017/cmd_db_test dbchanges/
-    
-(TODO - make a little shell wrapper script for this)
