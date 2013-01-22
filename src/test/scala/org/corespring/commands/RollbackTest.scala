@@ -15,64 +15,122 @@ class RollbackTest extends Specification {
     sequential
     Version.init(DbSingleton.db)
 
+    val testCollection : String = "test_rollback_collection"
+
+    val oneScripts = List(Script("firstName_toName.js",
+      """
+        |db.test_rollback_collection.find().forEach(function(o){
+        | o.name = o.firstName;
+        | delete o.firstName;
+        | db.test_rollback_collection.save(o);
+        |});
+        |//Down
+        |db.test_rollback_collection.find().forEach(function(o){
+        | o.firstName = o.name;
+        | delete o.name;
+        | db.test_rollback_collection.save(o);
+        |});
+        |
+      """.stripMargin))
+
+    val twoScripts = List(Script("name_to_givenName.js",
+      """
+        |db.test_rollback_collection.find().forEach(function(o){
+        | o.givenName = o.name;
+        | delete o.name;
+        | db.test_rollback_collection.save(o);
+        |});
+        |//Down
+        |db.test_rollback_collection.find().forEach(function(o){
+        | o.name = o.givenName;
+        | delete o.givenName;
+        | db.test_rollback_collection.save(o);
+        |});
+      """.stripMargin))
+
+    val threeScripts = List(Script("givenName_to_nickname.js",
+      """
+        |db.test_rollback_collection.find().forEach(function(o){
+        | o.nickname = o.givenName;
+        | delete o.givenName;
+        | db.test_rollback_collection.save(o);
+        |});
+        |//Down
+        |db.test_rollback_collection.find().forEach(function(o){
+        | o.givenName = o.nickname;
+        | delete o.nickname;
+        | db.test_rollback_collection.save(o);
+        |});
+      """.stripMargin))
+
+    def seedDb = {
+      val dbo: DBObject = MongoDBObject("firstName" -> "Ed")
+      DbSingleton.db(testCollection).insert(dbo)
+    }
+
+    def createVersion(scripts:List[Script], versionId:String ) = Version.create(new Version(new DateTime(),scripts,Some(versionId)))
+
     "rollback a single version" in new dbtidyup {
 
-      val dbo: DBObject = MongoDBObject("firstName" -> "Ed")
-
-      DbSingleton.db("test_rollback_collection").insert(dbo)
-
-      val oneScripts = List(Script("firstName_toName.js",
-        """
-          |db.test_rollback_collection.find().forEach(function(o){
-          | o.name = o.firstName;
-          | delete o.firstName;
-          | db.test_rollback_collection.save(o);
-          |});
-        """.stripMargin))
-
-      val twoScripts = List(Script("name_to_givenName.js",
-        """
-          |db.test_rollback_collection.find().forEach(function(o){
-          | o.givenName = o.name;
-          | delete o.name;
-          | db.test_rollback_collection.save(o);
-          |});
-          |//Down
-          |db.test_rollback_collection.find().forEach(function(o){
-          | o.name = o.givenName;
-          | delete o.givenName;
-          | db.test_rollback_collection.save(o);
-          |});
-        """.stripMargin))
+      seedDb
 
       val scriptsToRun: List[Script] = List(oneScripts, twoScripts).flatten.map(_.up)
       MigrateShell.run(DbName(DbSingleton.mongoUri), scriptsToRun)
 
-      val migratedDbo = DbSingleton.db("test_rollback_collection").findOne()
+      val migratedDbo = DbSingleton.db(testCollection).findOne()
       migratedDbo.get.get("givenName") === "Ed"
       migratedDbo.get.get("name") === null
 
-      val rollbackVersion = Version.create(new Version(new DateTime(), oneScripts, Some("versionOne")))
-      Version.create(new Version(new DateTime(), twoScripts, Some("versionTwo")))
+      val rollbackVersion = createVersion(oneScripts, "versionOne")
+      createVersion(twoScripts, "versionTwo")
 
       val rollback = new Rollback("versionOne", DbSingleton.mongoUri, List())
 
       rollback.begin
 
-      val rolledBackDbo = DbSingleton.db("test_rollback_collection").findOne()
+      val rolledBackDbo = DbSingleton.db(testCollection).findOne()
       rolledBackDbo.get.get("name") === "Ed"
       rolledBackDbo.get.get("givenName") === null
 
       rollbackVersion === Version.currentVersion
     }
-  }
 
-  trait dbtidyup extends After {
-    def after {
-      Version.dropCollection
-      DbSingleton.db("test_rollback_collection").dropCollection()
+
+    "rollback 2 versions" in {
+      seedDb
+
+      val scriptsToRun = List(oneScripts,twoScripts,threeScripts).flatten.map(_.up)
+      MigrateShell.run(DbName(DbSingleton.mongoUri), scriptsToRun)
+
+      val migratedDbo = DbSingleton.db(testCollection).findOne()
+      migratedDbo.get.get("nickname") === "Ed"
+
+      val zeroVersion = createVersion(List(), "versionZero")
+      val rollbackVersion = createVersion(oneScripts, "versionOne")
+      createVersion(twoScripts, "versionTwo")
+      createVersion(threeScripts, "versionThree")
+
+      new Rollback("versionOne", DbSingleton.mongoUri, List()).begin
+
+      rollbackVersion == Version.currentVersion
+
+      val rolledBackDbo = DbSingleton.db(testCollection).findOne()
+      rolledBackDbo.get.get("name") === "Ed"
+
+      new Rollback("versionZero", DbSingleton.mongoUri, List()).begin
+
+      val versionZeroDbo = DbSingleton.db(testCollection).findOne()
+      versionZeroDbo.get.get("firstName") === "Ed"
+    }
+
+    trait dbtidyup extends After {
+      def after {
+        Version.dropCollection
+        DbSingleton.db(testCollection).dropCollection()
+      }
     }
   }
+
 
 }
 

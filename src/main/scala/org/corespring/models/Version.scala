@@ -17,10 +17,16 @@ case class Version(dateCreated: DateTime,
 
 object Version {
 
+  def apply(versionId: Option[String], scripts: List[Script]): Version = new Version(new DateTime(), scripts, versionId)
+
   private lazy val Dao = new Dao(db)
 
   private var db: MongoDB = null
 
+  /** Initialise Version to use a established db
+    *
+    * @param db
+    */
   def init(db: MongoDB) = {
     this.db = db
   }
@@ -30,8 +36,6 @@ object Version {
     val collection = db("mongo_migrator_versions")
     val dao = new SalatDAO[Version, ObjectId](collection = collection) {}
   }
-
-  def apply(versionId: Option[String], scripts: List[Script]): Version = new Version(new DateTime(), scripts, versionId)
 
   def dropCollection {
     Dao.collection.dropCollection()
