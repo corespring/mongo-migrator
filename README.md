@@ -18,10 +18,12 @@ a db in production.
 ### Migrate
 Migrates the database
 
+    mongo-migrator migrate [version_id], mongo_uri script_path_1 script_path2 ...
+
 parameters:
 
-* versionId (optional) - this can be any arbitrary version number (eg a git commit hash)
-* mongoUri - the uri to the mongo db
+* version_id (optional) - this can be any arbitrary version number (eg a git commit hash)
+* mongo_uri - the uri to the mongo db
 * script_paths* - 1 or more relative paths to the mongo script folder to use for the migration
 
 ### Rollback
