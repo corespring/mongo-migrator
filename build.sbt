@@ -5,7 +5,9 @@ seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
 libraryDependencies ++= Seq(
   "org.mongodb" %% "casbah" % "2.4.1",
   "org.specs2" %% "specs2" % "1.12.2" % "test",
-   "com.novus" %% "salat" % "1.9.1"
+   "com.novus" %% "salat" % "1.9.1",
+   "org.clapper" %% "grizzled-slf4j" % "0.6.10",
+   "ch.qos.logback" % "logback-classic" % "1.0.3"
   )
 
 resolvers ++= Seq(

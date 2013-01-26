@@ -14,7 +14,7 @@ object MongoMigratorBuild extends Build {
       //because of all the db testing we need - only test serially
       parallelExecution.in(Test) := false,
       testOptions in Test += Tests.Cleanup( (loader: java.lang.ClassLoader) => {
-        loader.loadClass("org.corespring.tests.Cleanup").newInstance
+        loader.loadClass("org.corespring.migrator.tests.Cleanup").newInstance
       } )
     )
   )
