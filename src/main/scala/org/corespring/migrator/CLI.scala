@@ -5,6 +5,13 @@ import org.corespring.migrator.commands.{Versions, Rollback, ScriptValidator, Mi
 
 object CLI extends App with Logging {
 
+  def handleError(e: Throwable) {
+    println("An error has occured: " + e.getMessage)
+    println("see mongo-migrator.log for more details")
+    error(e.getMessage, e)
+    System.exit(1)
+  }
+
   val Header =
     """
       |mongo-migrator
@@ -37,44 +44,40 @@ object CLI extends App with Logging {
   logger.warn("CLI.warn")
   logger.error("CLI.error")
 
-  try{
+  try {
 
-  args.toList match {
-    case List() => println(Usage)
-    case action :: params => {
+    args.toList match {
+      case List() => println(Usage)
+      case action :: params => {
 
-      println("action: " + action)
+        println("action: " + action)
 
-      action match {
-        case Actions.Migrate => {
-          params match {
-            case versionId :: mongoUri :: scripts if !versionId.startsWith("mongodb://") => {
-              Migrate(mongoUri, scripts, Some(versionId), ScriptValidator.validateContents).begin
+        action match {
+          case Actions.Migrate => {
+            params match {
+              case versionId :: mongoUri :: scripts if !versionId.startsWith("mongodb://") => {
+                Migrate(mongoUri, scripts, Some(versionId), ScriptValidator.validateContents).begin
+              }
+              case mongoUri :: scripts => Migrate(mongoUri, scripts, None, ScriptValidator.validateContents).begin
+              case _ => println(Usage)
             }
-            case mongoUri :: scripts => Migrate(mongoUri, scripts, None, ScriptValidator.validateContents).begin
-            case _ => println(Usage)
           }
-        }
-        case Actions.Rollback => {
-          params match {
-            case targetId :: mongoUri :: scripts => Rollback(targetId, mongoUri, scripts, ScriptValidator.validateContents).begin
-            case _ => println(Usage)
+          case Actions.Rollback => {
+            params match {
+              case targetId :: mongoUri :: scripts => Rollback(targetId, mongoUri, scripts, ScriptValidator.validateContents).begin
+              case _ => println(Usage)
+            }
           }
+          case Actions.Versions => Versions(params.head).begin
+          case _ => println(Usage)
         }
-        case Actions.Versions => Versions(params.head).begin
-        case _ => println(Usage)
-      }
 
+      }
+      case _ => println(Usage)
     }
-    case _ => println(Usage)
-  }
   }
   catch {
-    case e : Throwable => {
-      println("An error has occured: " + e.getMessage)
-      println("see mongo-migrator.log for more details")
-      error(e.getMessage, e)
-      System.exit(1)
-    }
+    case io: java.io.IOException => handleError(io)
+    case e: Throwable => handleError(e)
   }
 }
