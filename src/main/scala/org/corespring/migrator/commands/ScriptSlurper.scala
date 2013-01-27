@@ -7,10 +7,10 @@ object ScriptSlurper {
 
   def scriptsFromPaths(paths: List[String]): List[Script] = {
 
-    def readContents(f:File) : String = {
+    def readContents(f: File): String = {
       val source = scala.io.Source.fromFile(f)
-      val lines = source .mkString
-      source.close ()
+      val lines = source.mkString
+      source.close()
       lines
     }
 
@@ -20,13 +20,14 @@ object ScriptSlurper {
       .map(f => new Script(f.getPath, readContents(f)))
   }
 
-  private def recursiveListFiles(f: File): List[File] = {
-
-    if (!f.exists())
-      List()
-    else {
-      val these = f.listFiles.toList
-      these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
+  private def recursiveListFiles(f: File): List[File] = f match {
+    case doesntExit : File if !f.exists() => List()
+    case file: File if f.isFile => List(file)
+    case directory: File if f.isDirectory => {
+      val files = directory.listFiles.toList
+      files ++ files.filter(_.isDirectory).flatMap(recursiveListFiles)
     }
+    case _ => List()
   }
+
 }

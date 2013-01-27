@@ -12,6 +12,11 @@ class ScriptSlurperTest extends Specification {
       scripts.length === 1
     }
 
+    "read a single file one" in {
+      val scripts = ScriptSlurper.scriptsFromPaths(List("src/test/resources/mock_files/one/1.js"))
+      scripts.length === 1
+    }
+
     "reads the contents" in {
       val scripts = ScriptSlurper.scriptsFromPaths(List("src/test/resources/mock_files/one"))
       scripts(0).contents === "alert(\"1\");"
