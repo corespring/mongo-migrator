@@ -12,13 +12,13 @@ class VersionsTest extends Specification {
 
   "Versions" should {
     "list all the versions" in new dbTest {
-      Version.create( new Version( new DateTime(), List(), Some("versionOne")))
-      Version.create( new Version( new DateTime(), List(), Some("versionTwo")))
+      Version.create(new Version(new DateTime(), List(), "versionOne"))
+      Version.create(new Version(new DateTime(), List(), "versionTwo"))
       Versions(DbSingleton.mongoUri).begin
     }
   }
 }
 
-trait dbTest extends After{
+trait dbTest extends After {
   def after = Version.dropCollection
 }

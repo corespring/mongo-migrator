@@ -5,9 +5,9 @@ case class DbName(
                    port: String,
                    db: String,
                    username: Option[String] = None,
-                   password: Option[String] = None){
+                   password: Option[String] = None) {
 
-  def toCmdLine() : String = {
+  def toCmdLine(): String = {
     List(
       Some("mongo"),
       Some(host + ":" + port + "/" + db),
@@ -24,14 +24,22 @@ object DbName {
       val NoUser = """mongodb://(.*)/(.*)""".r
       val NoUser(hostPort, dbname) = uri
       val (host, port) = getHostPort(hostPort)
+
+      require(!dbname.isEmpty)
+
       new DbName(host, port, dbname)
     }
 
     def parseUsername = {
-      val UserRegex = """mongodb://(.*)@(.*)/(.*)""".r
-      val UserRegex(userPass, hostPort, dbname) = uri
+      val UserRegex = """mongodb://(.*):(.*)@(.*)/(.*)""".r
+      val UserRegex(user, pass, hostPort, dbname) = uri
+
       val (host, port) = getHostPort(hostPort)
-      val (user, pass) = getUserPass(userPass)
+
+      require(!dbname.isEmpty)
+      require(!user.isEmpty)
+      require(!pass.isEmpty)
+
       new DbName(host, port, dbname, Some(user), Some(pass))
     }
 
@@ -51,6 +59,16 @@ object DbName {
       case s: String if s.contains("@") => parseUsername
     }
 
+  }
+
+  def isValid(uri: String): Boolean = {
+    try {
+      DbName(uri)
+      true
+    }
+    catch {
+      case e: Throwable => false
+    }
   }
 
 }

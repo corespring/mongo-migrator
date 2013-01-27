@@ -13,7 +13,7 @@ class MigrationTest extends Specification {
 
   def script(name:String) = new Script("dbchanges/" + name + ".js", "alert('" + name + "');")
 
-  def version(s:List[Script]) = new Version(dateCreated = new DateTime(), scripts = s)
+  def version(s:List[Script]) = new Version(dateCreated = new DateTime(), scripts = s, versionId ="v1")
 
   "Migration" should {
 

@@ -31,7 +31,7 @@ class MigrateTest extends Specification {
 
       import TestCollections._
 
-      val cmd = Migrate(mongoUri, List(path("migrate/one")))
+      val cmd = Migrate(mongoUri, List(path("migrate/one")), "v1")
       cmd.begin
       collection.count(MongoDBObject()) === 1
     }
@@ -46,7 +46,7 @@ class MigrateTest extends Specification {
         * this will probably be files added to a single folder
         */
       val paths = List(path("migrate/two/first"), path("migrate/two/second"))
-      val firstMigrate = Migrate(mongoUri, List(paths.head))
+      val firstMigrate = Migrate(mongoUri, List(paths.head), "v1")
       firstMigrate.begin
       collection.count(MongoDBObject()) === 1
 
@@ -55,7 +55,7 @@ class MigrateTest extends Specification {
         case _ => failure("didn't find item")
       }
 
-      val secondMigrate = Migrate(mongoUri, paths)
+      val secondMigrate = Migrate(mongoUri, paths, "v2")
       secondMigrate.begin
       collection.count(MongoDBObject()) === 1
       collection.findOne() match {
@@ -70,13 +70,13 @@ class MigrateTest extends Specification {
       import TestCollections._
 
       val paths = List(path("migrate/three/a"), path("migrate/three/b"), path("migrate/three/c"))
-      val firstMigrate = Migrate(mongoUri, paths.take(1))
+      val firstMigrate = Migrate(mongoUri, paths.take(1), "v1")
       firstMigrate.begin
       orgs.count(MongoDBObject()) === 3
       users.count(MongoDBObject()) === 2
       orgs.find(MongoDBObject("Location" -> "NYC")).length === 2
 
-      val secondMigrate = Migrate(mongoUri, paths.take(2))
+      val secondMigrate = Migrate(mongoUri, paths.take(2), "v2")
       secondMigrate.begin
       orgs.count(MongoDBObject()) === 3
       users.count(MongoDBObject()) === 2
@@ -85,7 +85,7 @@ class MigrateTest extends Specification {
       println(nycOrgs)
       nycOrgs.length === 2
 
-      val thirdMigrate = Migrate(mongoUri, paths)
+      val thirdMigrate = Migrate(mongoUri, paths, "v3")
       thirdMigrate.begin
       orgs.count(MongoDBObject()) === 3
       users.count(MongoDBObject()) === 2
@@ -93,20 +93,21 @@ class MigrateTest extends Specification {
       orgs.find(MongoDBObject("city" -> "New York")).length === 2
     }
 
-    "don't run if there are now scripts to run" in {
+    "if there are no new scripts - still add a Version to the db with an empty script List" in {
 
       import TestCollections._
 
-      val firstCmd = Migrate(mongoUri, List(path("/migrate/one")))
+      val firstCmd = Migrate(mongoUri, List(path("/migrate/one")), "v1")
       firstCmd.begin
       val firstRunVersion = Version.currentVersion
 
-      val secondCmd = Migrate(mongoUri, List(path("/migrate/one")))
+      val secondCmd = Migrate(mongoUri, List(path("/migrate/one")), "v2")
       secondCmd.begin
 
       val secondRunVersion = Version.currentVersion
 
-      firstRunVersion === secondRunVersion
+      secondRunVersion.scripts === List()
+      secondRunVersion.versionId === "v2"
 
     }
   }
@@ -115,7 +116,6 @@ class MigrateTest extends Specification {
 
     def after = {
       import TestCollections._
-
       Version.dropCollection
       collection.dropCollection()
       users.dropCollection()

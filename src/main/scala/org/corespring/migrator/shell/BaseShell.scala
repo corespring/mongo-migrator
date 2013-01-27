@@ -16,6 +16,8 @@ trait BaseShell extends Logging {
 
     def writeToFile(s:String) : File = {
       debug("write to file: " + shellFile)
+      debug("contents: ")
+      debug(s)
       val fw = new FileWriter(shellFile)
       fw.write(s)
       fw.close()

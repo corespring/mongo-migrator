@@ -16,7 +16,7 @@ class Rollback(
     case None => None
   }
 
-  def begin = {
+  override def begin = {
     println("Rollback.begin")
 
     withDb { db =>

@@ -68,7 +68,7 @@ class RollbackTest extends Specification {
       DbSingleton.db(testCollection).insert(dbo)
     }
 
-    def createVersion(scripts: List[Script], versionId: String) = Version.create(new Version(new DateTime(), scripts, Some(versionId)))
+    def createVersion(scripts: List[Script], versionId: String) = Version.create(new Version(new DateTime(), scripts, versionId))
 
     "rollback a single version" in new dbtidyup {
 
@@ -84,7 +84,7 @@ class RollbackTest extends Specification {
       val rollbackVersion = createVersion(oneScripts, "versionOne")
       createVersion(twoScripts, "versionTwo")
 
-      val rollback = Rollback("versionOne", DbSingleton.mongoUri, List() )
+      val rollback = Rollback("versionOne", DbSingleton.mongoUri, List())
 
       rollback.begin
 

@@ -2,20 +2,16 @@ package org.corespring.migrator.commands
 
 import org.corespring.migrator.models.{DbName, Version, Migration, Script}
 import org.corespring.migrator.shell.MigrateShell
-import org.corespring.migrator.log.Logger
 import com.mongodb.casbah.{MongoURI, MongoDB, MongoConnection}
 
 
 class Migrate(
                uri: String,
                scriptFolders: List[String],
-               versionId: Option[String] = None,
+               versionId: String,
                validateContents: (List[Script], List[String]) => Boolean) extends BaseCommand(uri) {
 
-  private val log = Logger.get("Migrate")
-
-  //TODO: Version must be unique
-  def begin = {
+  override def begin = {
 
     backup
 
@@ -27,7 +23,10 @@ class Migrate(
         val migration = Migration(currentVersion, scripts)
 
         migration.scripts match {
-          case List() => log.info("no scripts to run - up to date")
+          case List() => {
+            info("no scripts to run - storing version")
+            Version.create(Version(versionId, List()))
+          }
           case _ => {
 
             if (!validateContents(migration.scripts, scriptFolders)) {
@@ -35,9 +34,9 @@ class Migrate(
             }
 
             val dbName = DbName(uri)
-            log.info("[Migrate] -> run shell")
+            info("[Migrate] -> run shell")
             val successful = MigrateShell.run(dbName, migration.scripts.map(_.up))
-            log.info("[Migrate] -> run shell complete")
+            info("[Migrate] -> run shell complete")
 
             if (successful)
               Version.create(Version(versionId, migration.scripts))
@@ -49,7 +48,7 @@ class Migrate(
     }
   }
 
-  def backup = log.info("TODO: backup: " + uri + " not a top priority as we can do this externally for now")
+  def backup = debug("TODO: backup: " + uri + " not a top priority as we can do this externally for now")
 }
 
 object Migrate {
@@ -59,7 +58,7 @@ object Migrate {
   def apply(
              uri: String,
              scripts: List[String],
-             versionId: Option[String] = None,
+             versionId: String,
              validateContents: (List[Script], List[String]) => Boolean = alwaysValid): Migrate = {
     new Migrate(uri, scripts, versionId, validateContents)
   }

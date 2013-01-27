@@ -25,8 +25,19 @@ class DbNameTest extends Specification {
     "parse correctly" in {
       assertParse("mongodb://localhost/one", "localhost", "27017", "one")
       assertParse("mongodb://localhost:1111/one", "localhost", "1111", "one")
-      assertParse("mongodb://ed@localhost:1111/one", "localhost", "1111", "one", Some("ed"), Some("password"))
+      assertParse("mongodb://ed:password@localhost:1111/one", "localhost", "1111", "one", Some("ed"), Some("password"))
       assertParse("mongodb://ed:pword@localhost:1111/one", "localhost", "1111", "one", Some("ed"), Some("pword"))
+    }
+
+    "is valid works" in {
+
+      DbName.isValid(null) === false
+      DbName.isValid("") === false
+      DbName.isValid("blah blahlla") === false
+      DbName.isValid("mongodb://blah blahlla") === false
+      DbName.isValid("mongodb://server:port/") === false
+      DbName.isValid("mongodb://server:port/name") === true
+      DbName.isValid("mongodb://user@server:port/name") === false
     }
   }
 

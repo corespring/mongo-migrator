@@ -29,7 +29,7 @@ class VersionTest extends Specification {
 
     def script(s: String): Script = new Script(s, s)
 
-    def version(d: DateTime, s: List[Script], v: String): Version = new Version(d, s, Some(v))
+    def version(d: DateTime, s: List[Script], v: String): Version = new Version(d, s, v)
 
     def create(d: DateTime, s: List[Script], v: String) : Version = Version.create(version(d, s, v))
 
@@ -41,7 +41,7 @@ class VersionTest extends Specification {
       val lastVersion = s
       println("last version: " + lastVersion)
       create(new DateTime(), List(), lastVersion)
-      Version.currentVersion.versionId must equalTo(Some(lastVersion))
+      Version.currentVersion.versionId must equalTo(lastVersion)
     }
 
 

@@ -1,7 +1,9 @@
 package org.corespring.migrator.migrator
 
 import grizzled.slf4j.Logging
-import org.corespring.migrator.commands.{Versions, Rollback, ScriptValidator, Migrate}
+import org.corespring.migrator.commands._
+import org.corespring.migrator.models.DbName
+import scala.Some
 
 object CLI extends App with Logging {
 
@@ -21,7 +23,7 @@ object CLI extends App with Logging {
 
   val Usage =
     """
-      |mongo-migrator migrate [version_id], mongo_uri script_path_1 script_path2 ...
+      |mongo-migrator migrate version_id mongo_uri script_path_1 script_path2 ...
       |params:
       |@versionId - an arbitrary string value (eg: a git commit hash)
       |@mongo_uri - a valid mongo uri (eg: mongodb://user:pass@server:port/db)
@@ -50,30 +52,38 @@ object CLI extends App with Logging {
       case List() => println(Usage)
       case action :: params => {
 
-        println("action: " + action)
-
-        action match {
-          case Actions.Migrate => {
-            params match {
-              case versionId :: mongoUri :: scripts if !versionId.startsWith("mongodb://") => {
-                Migrate(mongoUri, scripts, Some(versionId), ScriptValidator.validateContents).begin
+        def cmd: Option[BaseCommand] = {
+          action match {
+            case Actions.Migrate => {
+              params match {
+                case versionId :: mongoUri :: scripts => {
+                  if (DbName.isValid(mongoUri))
+                    Some(Migrate(mongoUri, scripts, versionId, ScriptValidator.validateContents))
+                  else
+                    None
+                }
+                case _ => None
               }
-              case mongoUri :: scripts => Migrate(mongoUri, scripts, None, ScriptValidator.validateContents).begin
-              case _ => println(Usage)
             }
-          }
-          case Actions.Rollback => {
-            params match {
-              case targetId :: mongoUri :: scripts => Rollback(targetId, mongoUri, scripts, ScriptValidator.validateContents).begin
-              case _ => println(Usage)
+            case Actions.Rollback => {
+              params match {
+                case targetId :: mongoUri :: scripts => Some(Rollback(targetId, mongoUri, scripts, ScriptValidator.validateContents))
+                case _ => None
+              }
             }
+            case Actions.Versions => Some(Versions(params.head))
+            case _ => None
           }
-          case Actions.Versions => Versions(params.head).begin
-          case _ => println(Usage)
         }
 
+        cmd match {
+          case Some(cmd) => {
+            cmd.begin
+            cmd.cleanup
+          }
+          case _ => println(Usage)
+        }
       }
-      case _ => println(Usage)
     }
   }
   catch {

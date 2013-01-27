@@ -6,18 +6,21 @@ import org.corespring.migrator.models.Version
   *
   * @param uri
   */
-class Versions(uri:String) extends BaseCommand(uri) {
+class Versions(uri: String) extends BaseCommand(uri) {
 
-  def begin{
+  override def begin {
 
-    withDb{ db =>
-      val list = Version.list
-      val formatted = list.map(v => "id: " + v.id + ", versionId: " + v.versionId.getOrElse("?") + " " + v.dateCreated)
-      formatted.foreach( s => println("Version: " + s ) )
+    withDb {
+      db =>
+        val list = Version.list
+        val formatted = list.map(v => "id: " + v.id + ", versionId: " + v.versionId + " " + v.dateCreated)
+        formatted.foreach(s => println("Version: " + s))
     }
   }
 }
 
-object Versions{
-  def apply(uri:String) = { new Versions(uri)}
+object Versions {
+  def apply(uri: String) = {
+    new Versions(uri)
+  }
 }

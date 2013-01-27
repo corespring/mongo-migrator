@@ -11,13 +11,13 @@ import org.corespring.migrator.models.mongoContext._
 
 case class Version(dateCreated: DateTime,
                    scripts: List[Script],
-                   versionId: Option[String] = None,
+                   versionId: String,
                    id: ObjectId = new ObjectId())
 
 
 object Version {
 
-  def apply(versionId: Option[String], scripts: List[Script]): Version = new Version(new DateTime(), scripts, versionId)
+  def apply(versionId: String, scripts: List[Script]): Version = new Version(new DateTime(), scripts, versionId)
 
   private lazy val Dao = new Dao(db)
 
@@ -34,6 +34,12 @@ object Version {
   class Dao(db: MongoDB) extends ModelCompanion[Version, ObjectId] {
     RegisterJodaTimeConversionHelpers()
     val collection = db("mongo_migrator_versions")
+
+    collection.ensureIndex(
+      MongoDBObject("versionId" -> 1),
+      MongoDBObject("unique" -> true)
+    )
+
     val dao = new SalatDAO[Version, ObjectId](collection = collection) {}
   }
 
@@ -48,7 +54,7 @@ object Version {
 
     cursor.toList match {
       case List() => {
-        val defaultCurrent = new Version(new DateTime(), List())
+        val defaultCurrent = new Version(new DateTime(), List(), "version_0")
         Dao.save(defaultCurrent)
         defaultCurrent
       }
@@ -68,6 +74,16 @@ object Version {
   }
 
   def create(v: Version): Version = {
+
+    def alreadyExists = {
+      val idCount = Dao.count(MongoDBObject("versionId" -> v.versionId))
+      idCount > 0
+    }
+
+    if (alreadyExists){
+      throw new RuntimeException("Can't create versionId: " + v.versionId + " is taken")
+    }
+
     val newCurrent = v.copy(dateCreated = new DateTime())
     Dao.save(newCurrent)
     newCurrent
