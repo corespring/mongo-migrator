@@ -2,8 +2,9 @@ package org.corespring.migrator.shell
 
 import sys.process.ProcessLogger
 import org.corespring.migrator.models.Script
+import grizzled.slf4j.Logging
 
-class ScriptLogger(val s: Script) extends ProcessLogger {
+class ScriptLogger(val s: Script) extends ProcessLogger with Logging {
 
   var outLog: String = ""
   var errorLog: String = ""
@@ -13,10 +14,12 @@ class ScriptLogger(val s: Script) extends ProcessLogger {
   def buffer[T](f: => T): T = f
 
   def out(s: => String) {
+    info(s)
     outLog += (s + "\n")
   }
 
   def err(s: => String) {
+    error(s)
     errorLog += (s + "\n")
   }
 

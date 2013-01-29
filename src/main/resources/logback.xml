@@ -1,4 +1,5 @@
 <configuration>
+
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>mongo-migrator.log</file>
         <encoder>
@@ -6,6 +7,7 @@
         </encoder>
         <append>false</append>
     </appender>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%msg%n</pattern>
@@ -14,6 +16,11 @@
 
     <logger name="org.corespring.migrator" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- log errors out to the console -->
+    <logger name="org.corespring.migrator" level="ERROR" additivity="false">
+        <appender-ref ref="STDOUT"/>
     </logger>
 
     <root level="off">
