@@ -29,6 +29,8 @@ class MigrateTest extends Specification {
 
     "do one migration" in new dbtest {
 
+      Version.dropCollection
+
       import TestCollections._
 
       val cmd = Migrate(mongoUri, List(path("migrate/one")), "v1")
