@@ -32,6 +32,7 @@ class MigrateTest extends Specification {
       Version.dropCollection
 
       import TestCollections._
+      collection.remove(MongoDBObject())
 
       val cmd = Migrate(mongoUri, List(path("migrate/one")), "v1")
       cmd.begin

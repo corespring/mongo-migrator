@@ -11,9 +11,7 @@ class Migrate(
                versionId: String,
                validateContents: (List[Script], List[String]) => Boolean) extends BaseCommand(uri) {
 
-  override def begin = {
-
-    backup
+  override def begin =
 
     withDb {
       db =>
@@ -45,10 +43,9 @@ class Migrate(
 
           }
         }
-    }
-  }
 
-  def backup = debug("TODO: backup: " + uri + " not a top priority as we can do this externally for now")
+    }
+
 }
 
 object Migrate {
