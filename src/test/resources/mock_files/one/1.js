@@ -1,1 +1,3 @@
-alert("1");
+function up(){
+    alert("1");
+}

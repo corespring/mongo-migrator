@@ -4,9 +4,7 @@ import org.joda.time.DateTime
 import com.mongodb.casbah.commons.conversions.scala.RegisterJodaTimeConversionHelpers
 import com.novus.salat.dao._
 import com.mongodb.casbah.Imports._
-import com.mongodb.casbah.MongoConnection
-import com.mongodb.casbah.query.dsl._
-import org.corespring.migrator.models.mongoContext._
+import mongoContext._
 
 
 case class Version(dateCreated: DateTime,
@@ -43,7 +41,7 @@ object Version {
     val dao = new SalatDAO[Version, ObjectId](collection = collection) {}
   }
 
-  def dropCollection {
+  def dropCollection() {
     Dao.collection.dropCollection()
   }
 

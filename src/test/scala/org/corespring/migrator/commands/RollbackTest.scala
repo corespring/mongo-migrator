@@ -19,48 +19,58 @@ class RollbackTest extends Specification {
 
     val oneScripts = List(Script("firstName_toName.js",
       """
-        |db.test_rollback_collection.find().forEach(function(o){
-        | o.name = o.firstName;
-        | delete o.firstName;
-        | db.test_rollback_collection.save(o);
-        |});
-        |//Down
-        |db.test_rollback_collection.find().forEach(function(o){
-        | o.firstName = o.name;
-        | delete o.name;
-        | db.test_rollback_collection.save(o);
-        |});
+        |function up(){
+        |  db.test_rollback_collection.find().forEach(function(o){
+        |   o.name = o.firstName;
+        |   delete o.firstName;
+        |   db.test_rollback_collection.save(o);
+        |  });
+        |}
         |
+        |function down(){
+        |  db.test_rollback_collection.find().forEach(function(o){
+        |   o.firstName = o.name;
+        |   delete o.name;
+        |   db.test_rollback_collection.save(o);
+        |  });
+        |}
       """.stripMargin))
 
     val twoScripts = List(Script("name_to_givenName.js",
       """
-        |db.test_rollback_collection.find().forEach(function(o){
-        | o.givenName = o.name;
-        | delete o.name;
-        | db.test_rollback_collection.save(o);
-        |});
-        |//Down
-        |db.test_rollback_collection.find().forEach(function(o){
-        | o.name = o.givenName;
-        | delete o.givenName;
-        | db.test_rollback_collection.save(o);
-        |});
+        |function up(){
+        |  db.test_rollback_collection.find().forEach(function(o){
+        |   o.givenName = o.name;
+        |   delete o.name;
+        |   db.test_rollback_collection.save(o);
+        |  });
+        |}
+        |
+        |function down(){
+        |  db.test_rollback_collection.find().forEach(function(o){
+        |   o.name = o.givenName;
+        |   delete o.givenName;
+        |   db.test_rollback_collection.save(o);
+        |  });
+        |}
       """.stripMargin))
 
     val threeScripts = List(Script("givenName_to_nickname.js",
       """
-        |db.test_rollback_collection.find().forEach(function(o){
-        | o.nickname = o.givenName;
-        | delete o.givenName;
-        | db.test_rollback_collection.save(o);
-        |});
-        |//Down
-        |db.test_rollback_collection.find().forEach(function(o){
-        | o.givenName = o.nickname;
-        | delete o.nickname;
-        | db.test_rollback_collection.save(o);
-        |});
+        |function up() {
+        |  db.test_rollback_collection.find().forEach(function(o){
+        |   o.nickname = o.givenName;
+        |   delete o.givenName;
+        |   db.test_rollback_collection.save(o);
+        |  });
+        |}
+        |function down(){
+        |  db.test_rollback_collection.find().forEach(function(o){
+        |   o.givenName = o.nickname;
+        |   delete o.nickname;
+        |   db.test_rollback_collection.save(o);
+        |  });
+        |}
       """.stripMargin))
 
     def seedDb = {
@@ -74,7 +84,7 @@ class RollbackTest extends Specification {
 
       seedDb
 
-      val scriptsToRun: List[Script] = List(oneScripts, twoScripts).flatten.map(_.up)
+      val scriptsToRun: List[Script] = List(oneScripts, twoScripts).flatten
       MigrateShell.run(DbName(DbSingleton.mongoUri), scriptsToRun)
 
       val migratedDbo = DbSingleton.db(testCollection).findOne()
@@ -99,7 +109,7 @@ class RollbackTest extends Specification {
     "rollback 2 versions" in new dbtidyup {
       seedDb
 
-      val scriptsToRun = List(oneScripts, twoScripts, threeScripts).flatten.map(_.up)
+      val scriptsToRun = List(oneScripts, twoScripts, threeScripts).flatten
       MigrateShell.run(DbName(DbSingleton.mongoUri), scriptsToRun)
 
       val migratedDbo = DbSingleton.db(testCollection).findOne()

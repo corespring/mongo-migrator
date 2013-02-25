@@ -44,9 +44,7 @@ class Rollback(
 
             def rollbackScripts:List[Script] = {
               val allScripts = laterVersions.map( _.scripts ).flatten
-              val reversed = allScripts.reverse
-              val downScripts = reversed.map(_.down).flatten
-              downScripts
+              allScripts.reverse
             }
 
             val success = RollbackShell.run(DbName(uri), rollbackScripts)

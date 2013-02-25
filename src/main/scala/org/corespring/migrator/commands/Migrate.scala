@@ -33,7 +33,7 @@ class Migrate(
 
             val dbName = DbName(uri)
             info("[Migrate] -> run shell")
-            val successful = MigrateShell.run(dbName, migration.scripts.map(_.up))
+            val successful = MigrateShell.run(dbName, migration.scripts)
             info("[Migrate] -> run shell complete")
 
             if (successful)

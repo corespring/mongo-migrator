@@ -1,1 +1,3 @@
-alert("1.js");
+function up() {
+    alert("1.js");
+}
