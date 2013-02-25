@@ -19,7 +19,11 @@ class ScriptSlurperTest extends Specification {
 
     "reads the contents" in {
       val scripts = ScriptSlurper.scriptsFromPaths(List("src/test/resources/mock_files/one"))
-      scripts(0).contents === "alert(\"1\");"
+      val s = """function up(){
+                |    alert("1");
+                |}""".stripMargin
+
+      scripts(0).contents === s
       scripts(0).name === "src/test/resources/mock_files/one/1.js"
     }
 

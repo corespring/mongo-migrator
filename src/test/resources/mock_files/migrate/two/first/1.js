@@ -1,1 +1,3 @@
-db.migrateTest.insert({name: "Ed"});
+function up(){
+    db.migrateTest.insert({name: "Ed"});
+}

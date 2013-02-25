@@ -39,7 +39,6 @@ class MigrateTest extends Specification {
       collection.count(MongoDBObject()) === 1
     }
 
-
     "run two migrations" in new dbtest {
 
       import TestCollections._
@@ -98,11 +97,8 @@ class MigrateTest extends Specification {
 
     "if there are no new scripts - still add a Version to the db with an empty script List" in {
 
-      import TestCollections._
-
       val firstCmd = Migrate(mongoUri, List(path("/migrate/one")), "v1")
       firstCmd.begin
-      val firstRunVersion = Version.currentVersion
 
       val secondCmd = Migrate(mongoUri, List(path("/migrate/one")), "v2")
       secondCmd.begin
@@ -111,7 +107,6 @@ class MigrateTest extends Specification {
 
       secondRunVersion.scripts === List()
       secondRunVersion.versionId === "v2"
-
     }
   }
 

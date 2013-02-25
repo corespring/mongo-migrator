@@ -10,11 +10,11 @@ object ScriptValidator {
     * @param paths
     * @return
     */
-  def validateContents(scripts: List[Script], paths: List[String]): Boolean = {
+  def validateContents(scripts: Seq[Script], paths: List[String]): Boolean = {
 
-    val fileScripts: List[Script] = ScriptSlurper.scriptsFromPaths(paths)
+    val fileScripts: Seq[Script] = ScriptSlurper.scriptsFromPaths(paths)
 
-    val fileScriptsFiltered: List[Script] = fileScripts.filter(fs => scripts.exists(s => fs.name == s.name))
+    val fileScriptsFiltered: Seq[Script] = fileScripts.filter(fs => scripts.exists(s => fs.name == s.name))
 
     val fileScriptsThatAreDifferent = fileScriptsFiltered.filter{ fs =>
       val scriptThatDiffers = scripts.find(_.name == fs.name) match {

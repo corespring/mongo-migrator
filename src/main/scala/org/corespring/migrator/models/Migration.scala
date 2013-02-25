@@ -2,11 +2,11 @@ package org.corespring.migrator.models
 
 import org.corespring.migrator.exceptions.MigrationException
 
-case class Migration(scripts: List[Script])
+case class Migration(scripts: Seq[Script])
 
 object Migration {
 
-  def apply(currentVersion: Version, scripts: List[Script]) = {
+  def apply(currentVersion: Version, scripts: Seq[Script]) = {
 
     /** Trim the incoming scripts so that only new scripts are added to the migration
       * using the following rules:
@@ -20,12 +20,12 @@ object Migration {
       * @return the new scripts only
       * @throws a MigrationException if the rules above are broken
       */
-    def trimmed: List[Script] = {
+    def trimmed: Seq[Script] = {
       currentVersion.scripts match {
         case List() => scripts.sortWith(_.name < _.name)
         case _ => {
-          val currentSorted: List[Script] = currentVersion.scripts.sortWith(_.name < _.name)
-          val newSorted: List[Script] = scripts.sortWith(_.name < _.name)
+          val currentSorted: Seq[Script] = currentVersion.scripts.sortWith(_.name < _.name)
+          val newSorted: Seq[Script] = scripts.sortWith(_.name < _.name)
 
           val difference = newSorted.filterNot( currentSorted.contains(_) )
           difference match {

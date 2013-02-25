@@ -10,29 +10,37 @@ case class CmdResult(name:String,out:String,err:String,exitCode:Int)
 
 trait BaseShell extends Logging {
 
-  def run(dbName: DbName, scripts: List[Script]): Boolean = {
+  /** Build the command to be executed.
+   * @param dbName
+   * @param path
+   * @return
+   */
+  def cmd(dbName:DbName, path:String) : String = dbName.toCmdLine + " " + path
+
+  def prepareScript(contents:String) : String = contents
+
+  def run(dbName: DbName, scripts: Seq[Script]): Boolean = {
 
     val shellFile = "baseShell_tmp.js"
 
     def writeToFile(s:String) : File = {
-      debug("write to file: " + shellFile)
-      debug("contents: ")
-      debug(s)
       val fw = new FileWriter(shellFile)
       fw.write(s)
       fw.close()
       new File(shellFile)
     }
 
-    val cmdResults : List[CmdResult] = scripts.map {
+    val cmdResults : Seq[CmdResult] = scripts.map {
       sc =>
         import scala.sys.process._
         val logger = new ScriptLogger(sc)
-        val f : File = writeToFile(sc.contents)
-        val cmd = (dbName.toCmdLine + " " + f.getPath)
-        info("running: [" + cmd + "]")
-        val exitCode = cmd ! logger
+        val prepped = prepareScript(sc.contents)
+        val f : File = writeToFile(prepped)
+        val command = cmd(dbName,f.getPath)
+        info("running: [" + command + "]")
+        val exitCode = command ! logger
         f.delete()
+        println(logger.outLog)
         CmdResult(sc.name, logger.outLog, logger.errorLog, exitCode)
     }
 
@@ -41,7 +49,10 @@ trait BaseShell extends Logging {
     errorResults match {
       case Nil => true
       case _ => {
-        val msg = errorResults.map( r => r.name + "\n" + r.err).mkString("\n")
+
+        println(errorResults)
+        val msg = errorResults.map( r => r.name + "\n" + r.err + "\n" + r.out).mkString("\n")
+        println("shell exceptio: " + msg)
         throw new ShellException(msg)
       }
     }

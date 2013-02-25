@@ -7,7 +7,7 @@ class Rollback(
                targetId:String,
                uri:String,
                scriptPaths:List[String],
-               validateContents : (List[Script], List[String]) => Boolean) extends BaseCommand(uri){
+               validateContents : (Seq[Script], List[String]) => Boolean) extends BaseCommand(uri){
 
 
 
@@ -42,11 +42,9 @@ class Rollback(
               throw new RuntimeException("The scripts in the db and in the files don't match")
             }
 
-            def rollbackScripts:List[Script] = {
+            def rollbackScripts:Seq[Script] = {
               val allScripts = laterVersions.map( _.scripts ).flatten
-              val reversed = allScripts.reverse
-              val downScripts = reversed.map(_.down).flatten
-              downScripts
+              allScripts.reverse
             }
 
             val success = RollbackShell.run(DbName(uri), rollbackScripts)
@@ -66,9 +64,9 @@ class Rollback(
 
 object Rollback{
 
-  def alwaysValid(scripts:List[Script], paths:List[String]) : Boolean = true
+  def alwaysValid(scripts:Seq[Script], paths:List[String]) : Boolean = true
 
-  def apply(targetId:String, uri:String, scripts : List[String], validateFn : (List[Script], List[String]) => Boolean = alwaysValid) = {
+  def apply(targetId:String, uri:String, scripts : List[String], validateFn : (Seq[Script], List[String]) => Boolean = alwaysValid) = {
     new Rollback(targetId, uri, scripts, validateFn)
   }
 }

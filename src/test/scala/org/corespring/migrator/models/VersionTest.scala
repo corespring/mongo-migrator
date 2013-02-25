@@ -29,9 +29,9 @@ class VersionTest extends Specification {
 
     def script(s: String): Script = new Script(s, s)
 
-    def version(d: DateTime, s: List[Script], v: String): Version = new Version(d, s, v)
+    def version(d: DateTime, s: Seq[Script], v: String): Version = new Version(d, s, v)
 
-    def create(d: DateTime, s: List[Script], v: String) : Version = Version.create(version(d, s, v))
+    def create(d: DateTime, s: Seq[Script], v: String) : Version = Version.create(version(d, s, v))
 
     "return the current version" in /*new DbTest*/ {
 

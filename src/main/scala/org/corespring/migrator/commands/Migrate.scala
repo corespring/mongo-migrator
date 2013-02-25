@@ -9,10 +9,9 @@ class Migrate(
                uri: String,
                scriptFolders: List[String],
                versionId: String,
-               validateContents: (List[Script], List[String]) => Boolean) extends BaseCommand(uri) {
+               validateContents: (Seq[Script], List[String]) => Boolean) extends BaseCommand(uri) {
 
-  override def begin =
-
+  override def begin() {
     withDb {
       db =>
 
@@ -33,7 +32,7 @@ class Migrate(
 
             val dbName = DbName(uri)
             info("[Migrate] -> run shell")
-            val successful = MigrateShell.run(dbName, migration.scripts.map(_.up))
+            val successful = MigrateShell.run(dbName, migration.scripts)
             info("[Migrate] -> run shell complete")
 
             if (successful)
@@ -45,18 +44,18 @@ class Migrate(
         }
 
     }
-
+  }
 }
 
 object Migrate {
 
-  def alwaysValid(scripts: List[Script], scriptPaths: List[String]): Boolean = true
+  def alwaysValid(scripts: Seq[Script], scriptPaths: List[String]): Boolean = true
 
   def apply(
              uri: String,
              scripts: List[String],
              versionId: String,
-             validateContents: (List[Script], List[String]) => Boolean = alwaysValid): Migrate = {
+             validateContents: (Seq[Script], List[String]) => Boolean = alwaysValid): Migrate = {
     new Migrate(uri, scripts, versionId, validateContents)
   }
 }

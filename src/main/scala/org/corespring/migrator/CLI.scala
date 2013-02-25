@@ -1,7 +1,7 @@
 package org.corespring.migrator.migrator
 
 import grizzled.slf4j.Logging
-import org.corespring.migrator.commands._
+import org.corespring.migrator.commands.{BaseCommand,ScriptValidator,Versions,Synch,Migrate,Rollback}
 import org.corespring.migrator.models.DbName
 import scala.Some
 
@@ -39,6 +39,7 @@ object CLI extends App with Logging {
     val Migrate = "migrate"
     val Rollback = "rollback"
     val Versions = "versions"
+    val Synch = "synch"
   }
 
   logger.info("CLI.info")
@@ -72,6 +73,13 @@ object CLI extends App with Logging {
               }
             }
             case Actions.Versions => Some(Versions(params.head))
+            case Actions.Synch => {
+              params match {
+                case target :: versionId :: mongoUri :: scripts => Some(Synch(target,versionId,mongoUri,scripts))
+                case _ => None
+              }
+
+            }
             case _ => None
           }
         }

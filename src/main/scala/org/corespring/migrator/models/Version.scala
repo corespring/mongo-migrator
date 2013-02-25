@@ -4,20 +4,18 @@ import org.joda.time.DateTime
 import com.mongodb.casbah.commons.conversions.scala.RegisterJodaTimeConversionHelpers
 import com.novus.salat.dao._
 import com.mongodb.casbah.Imports._
-import com.mongodb.casbah.MongoConnection
-import com.mongodb.casbah.query.dsl._
-import org.corespring.migrator.models.mongoContext._
+import mongoContext._
 
 
 case class Version(dateCreated: DateTime,
-                   scripts: List[Script],
+                   scripts: Seq[Script],
                    versionId: String,
                    id: ObjectId = new ObjectId())
 
 
 object Version {
 
-  def apply(versionId: String, scripts: List[Script]): Version = new Version(new DateTime(), scripts, versionId)
+  def apply(versionId: String, scripts: Seq[Script]): Version = new Version(new DateTime(), scripts, versionId)
 
   private lazy val Dao = new Dao(db)
 
@@ -43,7 +41,7 @@ object Version {
     val dao = new SalatDAO[Version, ObjectId](collection = collection) {}
   }
 
-  def dropCollection {
+  def dropCollection() {
     Dao.collection.dropCollection()
   }
 
@@ -62,7 +60,7 @@ object Version {
     }
   }
 
-  def allScripts(v: Version): List[Script] = {
+  def allScripts(v: Version): Seq[Script] = {
     val cursor = Dao.find("_id" $lte v.id)
     val scripts = cursor.toList.map(_.scripts).flatten
     scripts
@@ -106,6 +104,10 @@ object Version {
   def findByVersionId(versionId: String): Option[Version] = Dao.findOne(MongoDBObject("versionId" -> versionId))
 
   def findVersionsLaterThan(v: Version): List[Version] = Dao.find("_id" $gt v.id).toList
+
+  def update(v:Version) {
+   Dao.save(v)
+  }
 
   def remove(v: Version) {
     Dao.remove(v)
