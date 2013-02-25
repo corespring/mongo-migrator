@@ -1,6 +1,5 @@
 package org.corespring.migrator.shell
 
-import org.corespring.migrator.models.{Script, DbName}
 
 object MigrateShell extends BaseShell {
 

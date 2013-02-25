@@ -51,21 +51,18 @@ What happens:
 The script finds the version specified, collates all the scripts from later versions and runs the *down* portion of each script in reverse order.
 
 ## Script format
-The migrator uses a simple convention to decide what is the up part of the script and what is the down part.
-If the file contains '//Down' on its own line - all lines after that are the down script, all lines before are the up script.
-If '//Down' isn't in the file - the file is assumed to be an up script only.
+The migrator uses a simple convention for running up and down portions of the script.
+You just need to define a function named 'up' or 'down' that takes no parameters.
+Note: the 'down' function is optional - but the 'up' function isn't.
 
 A up and down script:
-
-    function up(a){alert('up')}
-    //Down
-    function down(a){ alert('down')}
+    var x = "y";
+    function up(a){ alert(x); }
+    function down(a){ alert(x); }
     
     
 ## Differences between Files and Scripts
 If when you run rollback - there is a discrepency between the script contents in the db and the script contents in the local file, the command line will fail.
-
-
 
 
 ## Installation
