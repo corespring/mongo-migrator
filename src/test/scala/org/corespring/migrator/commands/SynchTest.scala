@@ -16,7 +16,7 @@ class SynchTest extends Specification {
   sequential
 
   class tidySynch extends After {
-    def after = {
+    def after {
       val cmd = "rm -fr " + root
       cmd.!!
       Version.dropCollection()
