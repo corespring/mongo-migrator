@@ -9,10 +9,13 @@ class Synch(target: String,
             scriptPaths: Seq[String]) extends BaseCommand(uri) {
 
   def begin() {
-    target match {
-      case "db" => withVersion(versionId)(synchDb)
-      case "files" => withVersion(versionId)(synchFiles)
-      case _ => println("Unknown target")
+    withDb {
+      db =>
+        target match {
+          case "db" => withVersion(versionId)(synchDb)
+          case "files" => withVersion(versionId)(synchFiles)
+          case _ => println("Unknown target")
+        }
     }
   }
 
@@ -25,7 +28,11 @@ class Synch(target: String,
 
   def synchDb(v: Version) {
     val scripts = ScriptSlurper.scriptsFromPaths(scriptPaths)
-    Version.update(v.copy(scripts = scripts))
+    def areInDb(dbScripts:Seq[Script])(s:Script) : Boolean = {
+      dbScripts.exists{ dbs => dbs.name == s.name}
+    }
+    val trimmed = scripts.filter(areInDb(v.scripts))
+    Version.update(v.copy(scripts = trimmed))
   }
 
   def synchFiles(v: Version) {
@@ -47,10 +54,10 @@ class Synch(target: String,
 
 object Synch {
 
-  def apply( target: String,
-             versionId: String,
-             uri: String,
-             scripts: Seq[String]): Synch = {
+  def apply(target: String,
+            versionId: String,
+            uri: String,
+            scripts: Seq[String]): Synch = {
     new Synch(target, versionId, uri, scripts)
   }
 }

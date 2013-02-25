@@ -33,6 +33,8 @@ object CLI extends App with Logging {
       |
       |mongo-migrator versions mongo_uri
       |
+      |mongo-migrator synch db|files version_id mongo_uri scripts*
+      |
     """.stripMargin
 
   object Actions {
@@ -41,11 +43,6 @@ object CLI extends App with Logging {
     val Versions = "versions"
     val Synch = "synch"
   }
-
-  logger.info("CLI.info")
-  logger.debug("CLI.debug")
-  logger.warn("CLI.warn")
-  logger.error("CLI.error")
 
   try {
 

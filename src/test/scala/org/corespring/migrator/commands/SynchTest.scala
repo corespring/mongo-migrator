@@ -1,6 +1,6 @@
 package org.corespring.migrator.commands
 
-import org.specs2.mutable.{After, Specification}
+import org.specs2.mutable.{BeforeAfter, After, Specification}
 import java.io.{FileWriter, File}
 import org.corespring.migrator.models.{Script, Version}
 import org.corespring.migrator.helpers.DbSingleton
@@ -11,14 +11,20 @@ class SynchTest extends Specification {
 
   Version.init(DbSingleton.db)
 
-  val root = "src/test/resources/mock_files/synch"
 
   sequential
 
-  class tidySynch extends After {
+  class synch extends BeforeAfter {
+
+    def root = "src/test/resources/mock_files/synch"
+    def rootFolder = new File(root)
+
+    def before {
+      rootFolder.mkdir
+    }
+
     def after {
-      val cmd = "rm -fr " + root
-      cmd.!!
+      rootFolder.delete
       Version.dropCollection()
     }
   }
@@ -32,14 +38,8 @@ class SynchTest extends Specification {
 
 
   "Synch" should {
-    "synch db" in new tidySynch {
-
-      val rootFolder = new File(root)
-      rootFolder.mkdir()
-
-      val file = new File(root + "/one.js")
-
-      writeToFile("1", file.getCanonicalPath)
+    "synch db" in new synch {
+      val file = dumpFile(root + "/one.js", "1")
 
       val scripts = Seq(
         Script(root + "/one.js", "1")
@@ -47,7 +47,6 @@ class SynchTest extends Specification {
       Version.create(Version(versionId = "1", scripts = scripts))
 
       writeToFile("2", file.getCanonicalPath)
-
       Synch("db", "1", DbSingleton.mongoUri, Seq(root)).begin()
 
       Version.findByVersionId("1") match {
@@ -58,20 +57,44 @@ class SynchTest extends Specification {
       }
     }
 
-    "synch files" in new tidySynch{
+    def dumpFile(name: String, contents: String): File = {
+      val file = new File(name)
+      writeToFile(contents, file.getCanonicalPath)
+      file
+    }
 
-      val rootFolder = new File(root)
-      rootFolder.mkdir()
+    "when synching db - only synch items that already exist" in new synch {
 
-      val file = new File(root + "/one.js")
+      dumpFile(root + "/one.js", "1")
+      dumpFile(root + "/two.js", "2")
 
-      writeToFile("1", file.getCanonicalPath)
+      val scripts = Seq(
+        Script(root + "/one.js", "1")
+      )
+
+      Version.create(
+        Version(versionId = "1", scripts = scripts)
+      )
+
+      Synch("db", "1", DbSingleton.mongoUri, Seq(root)).begin()
+
+      Version.findByVersionId("1") match {
+        case Some(v) => {
+          v.scripts.length === 1
+        }
+        case _ => failure("can't find version with id 1")
+      }
+
+
+    }
+
+    "synch files" in new synch {
+      dumpFile(root + "/one.js", "1")
 
       val scripts = Seq(
         Script(root + "/one.js", "2")
       )
       Version.create(Version(versionId = "1", scripts = scripts))
-
 
       Synch("files", "1", DbSingleton.mongoUri, Seq(root)).begin()
 
