@@ -78,13 +78,13 @@ class RollbackTest extends Specification {
       DbSingleton.db(testCollection).insert(dbo)
     }
 
-    def createVersion(scripts: List[Script], versionId: String) = Version.create(new Version(new DateTime(), scripts, versionId))
+    def createVersion(scripts: Seq[Script], versionId: String) = Version.create(new Version(new DateTime(), scripts, versionId))
 
     "rollback a single version" in new dbtidyup {
 
       seedDb
 
-      val scriptsToRun: List[Script] = List(oneScripts, twoScripts).flatten
+      val scriptsToRun: Seq[Script] = List(oneScripts, twoScripts).flatten
       MigrateShell.run(DbName(DbSingleton.mongoUri), scriptsToRun)
 
       val migratedDbo = DbSingleton.db(testCollection).findOne()

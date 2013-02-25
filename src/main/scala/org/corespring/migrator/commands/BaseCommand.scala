@@ -7,7 +7,7 @@ import grizzled.slf4j.Logging
 
 abstract class BaseCommand(uri: String) extends Logging {
 
-  def begin : Unit
+  def begin()
 
   protected def withDb(fn: (MongoDB => Unit)) {
     val connection: MongoConnection = MongoConnection(MongoURI(uri))

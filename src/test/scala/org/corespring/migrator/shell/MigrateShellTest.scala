@@ -20,7 +20,7 @@ class MigrateShellTest extends Specification {
   "MigrateShell" should {
     "run a single migration" in new dbtest {
       val paths = List("src/test/resources/mock_files/shell/one")
-      val scripts: List[Script] = ScriptSlurper.scriptsFromPaths(paths)
+      val scripts: Seq[Script] = ScriptSlurper.scriptsFromPaths(paths)
 
       val migration = new Migration(scripts)
       val dbName : DbName = DbName(DbSingleton.mongoUri)
@@ -32,7 +32,7 @@ class MigrateShellTest extends Specification {
 
     "if no up is specified an error is thrown" in new dbtest {
       val paths = List("src/test/resources/mock_files/shell/two")
-      val scripts: List[Script] = ScriptSlurper.scriptsFromPaths(paths)
+      val scripts: Seq[Script] = ScriptSlurper.scriptsFromPaths(paths)
       val migration = new Migration(scripts)
       val dbName : DbName = DbName(DbSingleton.mongoUri)
       MigrateShell.run(dbName,migration.scripts) must throwA[ShellException]

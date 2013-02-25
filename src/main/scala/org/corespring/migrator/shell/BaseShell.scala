@@ -19,7 +19,7 @@ trait BaseShell extends Logging {
 
   def prepareScript(contents:String) : String = contents
 
-  def run(dbName: DbName, scripts: List[Script]): Boolean = {
+  def run(dbName: DbName, scripts: Seq[Script]): Boolean = {
 
     val shellFile = "baseShell_tmp.js"
 
@@ -30,7 +30,7 @@ trait BaseShell extends Logging {
       new File(shellFile)
     }
 
-    val cmdResults : List[CmdResult] = scripts.map {
+    val cmdResults : Seq[CmdResult] = scripts.map {
       sc =>
         import scala.sys.process._
         val logger = new ScriptLogger(sc)

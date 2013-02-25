@@ -50,6 +50,18 @@ What happens:
 
 The script finds the version specified, collates all the scripts from later versions and runs the *down* portion of each script in reverse order.
 
+### Synch scripts
+
+    mongo-migrator synch target versionId path_to_scripts
+    //eg
+    //synch the files to match whats in the db
+    mongo-migrator synch files 1 scripts/
+    //synch the db to match whats in the files
+    mongo-migrator synch db 1 scripts/
+
+Resynchs the contents in the db or local filesystem to be inline with the contents from the other source.
+
+
 ## Script format
 The migrator uses a simple convention for running up and down portions of the script.
 You just need to define a function named 'up' or 'down' that takes no parameters.
