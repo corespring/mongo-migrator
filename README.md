@@ -68,6 +68,7 @@ You just need to define a function named 'up' or 'down' that takes no parameters
 Note: the 'down' function is optional - but the 'up' function isn't.
 
 A up and down script:
+
     var x = "y";
     function up(a){ alert(x); }
     function down(a){ alert(x); }
