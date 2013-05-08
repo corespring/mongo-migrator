@@ -38,6 +38,7 @@ trait BaseShell extends Logging {
         val f : File = writeToFile(prepped)
         val command = cmd(dbName,f.getPath)
         info("running: [" + command + "]")
+        println("running migration script : [" + sc.name + "]");
         val exitCode = command ! logger
         f.delete()
         println(logger.outLog)
