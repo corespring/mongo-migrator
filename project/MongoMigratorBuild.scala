@@ -9,7 +9,7 @@ object MongoMigratorBuild extends Build {
     settings = Project.defaultSettings ++ Seq(
       name := "mongo-migrator",
       organization := "org.corespring",
-      version := "0.1-SNAPSHOT",
+      version := "0.2.0",
       scalaVersion := "2.9.2",
       //because of all the db testing we need - only test serially
       parallelExecution.in(Test) := false,

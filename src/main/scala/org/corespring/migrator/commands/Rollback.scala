@@ -1,6 +1,6 @@
 package org.corespring.migrator.commands
 
-import org.corespring.migrator.models.{Script,Version, DbName}
+import org.corespring.migrator.models.{DbInfo, Script, Version}
 import org.corespring.migrator.shell.RollbackShell
 
 class Rollback(
@@ -47,7 +47,7 @@ class Rollback(
               allScripts.reverse
             }
 
-            val success = RollbackShell.run(DbName(uri), rollbackScripts)
+            val success = RollbackShell.run(DbInfo(uri), rollbackScripts)
 
             if (success){
              laterVersions.map(Version.remove(_))

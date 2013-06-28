@@ -1,12 +1,12 @@
 package org.corespring.migrator.commands
 
-import org.specs2.mutable.{After, Specification}
-import org.corespring.migrator.helpers.DbSingleton
-import com.mongodb.casbah.commons.MongoDBObject
-import org.corespring.migrator.models.{Version, Script, DbName}
-import org.joda.time.DateTime
-import org.corespring.migrator.shell.MigrateShell
 import com.mongodb.DBObject
+import com.mongodb.casbah.commons.MongoDBObject
+import org.corespring.migrator.helpers.DbSingleton
+import org.corespring.migrator.models.{DbInfo, Version, Script}
+import org.corespring.migrator.shell.MigrateShell
+import org.joda.time.DateTime
+import org.specs2.mutable.{After, Specification}
 
 class RollbackTest extends Specification {
 
@@ -85,7 +85,7 @@ class RollbackTest extends Specification {
       seedDb
 
       val scriptsToRun: Seq[Script] = List(oneScripts, twoScripts).flatten
-      MigrateShell.run(DbName(DbSingleton.mongoUri), scriptsToRun)
+      MigrateShell.run(DbInfo(DbSingleton.mongoUri), scriptsToRun)
 
       val migratedDbo = DbSingleton.db(testCollection).findOne()
       migratedDbo.get.get("givenName") === "Ed"
@@ -110,7 +110,7 @@ class RollbackTest extends Specification {
       seedDb
 
       val scriptsToRun = List(oneScripts, twoScripts, threeScripts).flatten
-      MigrateShell.run(DbName(DbSingleton.mongoUri), scriptsToRun)
+      MigrateShell.run(DbInfo(DbSingleton.mongoUri), scriptsToRun)
 
       val migratedDbo = DbSingleton.db(testCollection).findOne()
       migratedDbo.get.get("nickname") === "Ed"

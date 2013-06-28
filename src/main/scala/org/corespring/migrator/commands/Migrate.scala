@@ -1,8 +1,9 @@
 package org.corespring.migrator.commands
 
-import org.corespring.migrator.models.{DbName, Version, Migration, Script}
+import org.corespring.migrator.models._
 import org.corespring.migrator.shell.MigrateShell
 import com.mongodb.casbah.{MongoURI, MongoDB, MongoConnection}
+import org.corespring.migrator.models.Script
 
 
 class Migrate(
@@ -30,9 +31,9 @@ class Migrate(
               throw new RuntimeException("The scripts in the db and in the files don't match")
             }
 
-            val dbName = DbName(uri)
+            val dbInfo = DbInfo(uri)
             info("[Migrate] -> run shell")
-            val successful = MigrateShell.run(dbName, migration.scripts)
+            val successful = MigrateShell.run(dbInfo, migration.scripts)
             info("[Migrate] -> run shell complete")
 
             if (successful)

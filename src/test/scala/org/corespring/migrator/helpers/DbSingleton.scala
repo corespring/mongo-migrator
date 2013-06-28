@@ -1,7 +1,7 @@
 package org.corespring.migrator.helpers
 
 import com.mongodb.casbah.{MongoURI, MongoDB, MongoConnection}
-import org.corespring.migrator.models.DbName
+import org.corespring.migrator.models.DbInfo
 
 object DbSingleton {
   lazy val connection : MongoConnection = MongoConnection(MongoURI(mongoUri))
@@ -13,7 +13,7 @@ object DbSingleton {
 
   private def init : MongoDB = {
     val db = connection(dbName)
-    val name = DbName(mongoUri)
+    val name = DbInfo(mongoUri)
     println("db -> " + name + " uri: " + mongoUri)
     name.username.map { u =>
       db.authenticate(u, name.password.get)

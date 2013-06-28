@@ -2,7 +2,7 @@ package org.corespring.migrator.migrator
 
 import grizzled.slf4j.Logging
 import org.corespring.migrator.commands.{BaseCommand,ScriptValidator,Versions,Synch,Migrate,Rollback}
-import org.corespring.migrator.models.DbName
+import org.corespring.migrator.models.DbInfo
 import scala.Some
 
 object CLI extends App with Logging {
@@ -55,7 +55,7 @@ object CLI extends App with Logging {
             case Actions.Migrate => {
               params match {
                 case versionId :: mongoUri :: scripts => {
-                  if (DbName.isValid(mongoUri))
+                  if (DbInfo.isValid(mongoUri))
                     Some(Migrate(mongoUri, scripts, versionId, ScriptValidator.validateContents))
                   else
                     None

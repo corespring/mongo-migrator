@@ -1,6 +1,6 @@
 package org.corespring.migrator.shell
 
-import org.corespring.migrator.models.{DbName, Script}
+import org.corespring.migrator.models.{DbInfo, Script}
 import exceptions.ShellException
 import java.io.{File,FileWriter}
 import grizzled.slf4j.Logging
@@ -11,15 +11,12 @@ case class CmdResult(name:String,out:String,err:String,exitCode:Int)
 trait BaseShell extends Logging {
 
   /** Build the command to be executed.
-   * @param dbName
-   * @param path
-   * @return
    */
-  def cmd(dbName:DbName, path:String) : String = dbName.toCmdLine + " " + path
+  def cmd( dbInfo :DbInfo, path:String) : String = dbInfo.toCmdLine + " " + path
 
   def prepareScript(contents:String) : String = contents
 
-  def run(dbName: DbName, scripts: Seq[Script]): Boolean = {
+  def run(dbInfo: DbInfo, scripts: Seq[Script]): Boolean = {
 
     val shellFile = "baseShell_tmp.js"
 
@@ -36,7 +33,7 @@ trait BaseShell extends Logging {
         val logger = new ScriptLogger(sc)
         val prepped = prepareScript(sc.contents)
         val f : File = writeToFile(prepped)
-        val command = cmd(dbName,f.getPath)
+        val command = cmd(dbInfo,f.getPath)
         info("running: [" + command + "]")
         println("running migration script : [" + sc.name + "]");
         val exitCode = command ! logger

@@ -1,33 +1,24 @@
 package org.corespring.migrator.commands
 
-import com.mongodb.casbah.{MongoURI, MongoConnection, MongoDB}
-import org.corespring.migrator.models.{Version, DbName}
+import com.mongodb.casbah.MongoDB
 import grizzled.slf4j.Logging
+import org.corespring.migrator.models.{DbHelper, Version}
 
 
 abstract class BaseCommand(uri: String) extends Logging {
 
+  lazy val helper : DbHelper = new DbHelper(uri)
+
   def begin()
 
   protected def withDb(fn: (MongoDB => Unit)) {
-    val connection: MongoConnection = MongoConnection(MongoURI(uri))
-    debug("connection: " + connection)
-    val dbName: DbName = DbName(uri)
-    val db: MongoDB = connection(dbName.db)
-    dbName.username.map {
-      u =>
-        require(dbName.password.isDefined)
-        db.authenticate(u, dbName.password.get)
-    }
-    debug("db: " + db)
-    Version.init(db)
-    fn(db)
+    Version.init(helper.mongoDB)
+    fn(helper.mongoDB)
   }
 
   def cleanup : Unit = {
-    val connection: MongoConnection = MongoConnection(MongoURI(uri))
-    debug("closing connection: " + connection)
-    connection.close()
+    debug("closing connection: " + helper.connection)
+    helper.connection.close()
   }
 
 }
