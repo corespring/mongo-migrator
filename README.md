@@ -98,10 +98,10 @@ Publishing/Hosting is do be done..
 
 * Install sbt 12
 
-    # to build a one-jar:
-    sbt one-jar
-    # to compile
-    sbt compile
+     # to build a one-jar:
+     sbt one-jar
+     # to compile
+     sbt compile
 
 ### Running tests
 
