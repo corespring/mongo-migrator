@@ -44,7 +44,10 @@ object DbInfo {
     }
 
     val info = uri match {
-      case setRegex(set, uri) => matcher(uri).copy(replicaSet = Some(set))
+      case setRegex(set, uri) => {
+        val info = matcher(uri)
+        if(info != null) info.copy(replicaSet = Some(set)) else info
+      }
       case _ => matcher(uri)
     }
 

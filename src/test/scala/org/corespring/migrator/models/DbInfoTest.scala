@@ -20,6 +20,11 @@ class DbInfoTest extends Specification {
         DbInfo("server:27017,server2:27017", "db", Some("ed"), Some("pass"), Some("my-set"))
     }
 
+    "read set with no user pass" in {
+      DbInfo("rs0|mongodb://localhost:27020,localhost:27021,localhost:27022/test") ===
+        DbInfo("localhost:27020,localhost:27021,localhost:27022", "test", None, None, Some("rs0"))
+    }
+
     "throw an exception for a bad uri" in {
       { DbInfo("...") } must throwA[IllegalArgumentException]
     }
