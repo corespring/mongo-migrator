@@ -95,14 +95,11 @@ At the moment we build a one-jar and use it with the command line.
 Publishing/Hosting is do be done..
 
 ## Developing
-
-* Install sbt 12
-
-
-     # to build a one-jar:
-     sbt one-jar
-     # to compile
-     sbt compile
+you'll need to have sbt installed.
+ 
+    sbt one-jar # to build a one-jar:
+    sbt compile # to compile
+     
 
 ### Running tests
 
