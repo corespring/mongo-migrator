@@ -62,6 +62,17 @@ The script finds the version specified, collates all the scripts from later vers
 Resynchs the contents in the db or local filesystem to be inline with the contents from the other source.
 
 
+## Mongo URIs and Replica sets
+
+If you need to work with a replica set dbs use the following format as the uri:
+
+    my-replica-set|mongodb://server-one:111,server-two:2222/db
+
+    aka
+
+    replica_set|mongo_uri
+
+
 ## Script format
 The migrator uses a simple convention for running up and down portions of the script.
 You just need to define a function named 'up' or 'down' that takes no parameters.
@@ -80,4 +91,9 @@ If when you run rollback - there is a discrepency between the script contents in
 
 ## Installation
 
+
+### Release Notes:
+
+- 0.2 : Added support for replica sets
+- 0.1 : First version
 
