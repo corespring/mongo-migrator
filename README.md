@@ -86,10 +86,32 @@ A up and down script:
     
     
 ## Differences between Files and Scripts
-If when you run rollback - there is a discrepency between the script contents in the db and the script contents in the local file, the command line will fail.
+If when you run rollback - if there is a discrepency between the script contents in the db and the script contents in the local file, the command line will fail.
 
 
 ## Installation
+
+At the moment we build a one-jar and use it with the command line.
+Publishing/Hosting is do be done..
+
+## Developing
+
+* Install sbt 12
+
+    # to build a one-jar:
+    sbt one-jar
+    # to compile
+    sbt compile
+
+### Running tests
+
+    sbt test
+
+By default the tests run against a local single mongo db.
+If you want to run against a replica set db you'll need to set the following env var: `MONGO_MIGRATOR_TEST_DB_URI`
+
+There is a script here that will help you quickly set up a replica set:
+https://github.com/edeustace/mongo-db-utils/tree/master/integration-test-env
 
 
 ### Release Notes:
