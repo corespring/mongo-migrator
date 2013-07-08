@@ -1,28 +1,26 @@
 package org.corespring.migrator.models
 
-import com.mongodb.casbah.{MongoURI, MongoConnection, MongoDB}
 import com.mongodb.ServerAddress
+import com.mongodb.casbah.{MongoURI, MongoConnection, MongoDB}
 
-class DbHelper(val uri:String){
+class DbHelper(val uri: String) {
 
-  lazy val info : DbInfo = DbInfo(uri)
+  lazy val info: DbInfo = DbInfo(uri)
 
-  def mongoDB : MongoDB = {
-    val db = connection(info.db)
-    info.username.map {
-      u =>
-        require(info.password.isDefined)
-        db.authenticate(u, info.password.get)
-    }
-    db
-  }
+  def hostPort: String = info.hostPort
+
+  def db: String = info.db
+
+  def username: Option[String] = info.username
+
+  def password: Option[String] = info.password
 
   lazy val connection: MongoConnection = {
-    info.replicaSet.map{
+    info.replicaSet.map {
       s =>
-        val hosts : List[ServerAddress] = hostPort.split(",").toList.map( hp => {
+        val hosts: List[ServerAddress] = hostPort.split(",").toList.map(hp => {
           val pair = hp.split(":")
-          if(pair.length == 0){
+          if (pair.length == 0) {
             new ServerAddress(pair(0))
           } else {
             new ServerAddress(pair(0), pair(1).toInt)
@@ -32,9 +30,19 @@ class DbHelper(val uri:String){
     }.getOrElse(MongoConnection(MongoURI(uri)))
   }
 
-  def hostPort : String = info.hostPort
-  def db : String = info.db
-  def username : Option[String] = info.username
-  def password : Option[String] = info.password
+  lazy val mongoDB: MongoDB = {
+    val db: MongoDB = connection(info.db)
+
+    info.username.map {
+      u =>
+        if (!db.isAuthenticated) {
+          require(info.password.isDefined)
+          db.authenticate(u, info.password.get)
+        }
+    }
+
+    db
+  }
+
 }
 

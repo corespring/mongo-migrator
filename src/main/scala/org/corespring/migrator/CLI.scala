@@ -46,7 +46,11 @@ object CLI extends App with Logging {
 
   try {
 
-    args.toList match {
+    val argsList = args.toList
+
+    println("Args List: " + argsList)
+
+    argsList match {
       case List() => println(Usage)
       case action :: params => {
 
