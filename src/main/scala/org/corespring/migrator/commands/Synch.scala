@@ -14,7 +14,7 @@ class Synch(target: String,
         target match {
           case "db" => withVersion(versionId)(synchDb)
           case "files" => withVersion(versionId)(synchFiles)
-          case _ => println("Unknown target")
+          case _ => error("Unknown target")
         }
     }
   }
@@ -22,7 +22,7 @@ class Synch(target: String,
   private def withVersion(versionId: String)(fn: Version => Unit) {
     Version.findByVersionId(versionId) match {
       case Some(v) => fn(v)
-      case _ => println("can't find version")
+      case _ => error("can't find version")
     }
   }
 

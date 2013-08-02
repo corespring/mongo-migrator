@@ -14,7 +14,7 @@ class ScriptLogger(val s: Script) extends ProcessLogger with Logging {
   def buffer[T](f: => T): T = f
 
   def out(s: => String) {
-    info(s)
+    debug(s)
     outLog += (s + "\n")
   }
 
@@ -24,13 +24,13 @@ class ScriptLogger(val s: Script) extends ProcessLogger with Logging {
   }
 
   def printToLogger() {
-    println("--------------")
-    println("Running: " + s.name)
-    println("--------------")
-    println(outLog)
+    debug("--------------")
+    debug("Running: " + s.name)
+    debug("--------------")
+    debug(outLog)
     if (hasError) {
-      println("error: " + errorLog)
+      debug("error: " + errorLog)
     }
-    println("--------------")
+    debug("--------------")
   }
 }

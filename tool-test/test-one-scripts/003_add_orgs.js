@@ -1,2 +1,4 @@
-db.orgs.insert({ org: "CoreSpring"});
-db.orgs.insert({ org: "NYSED"});
+function up(){
+  db.orgs.insert({ org: "CoreSpring"});
+  db.orgs.insert({ org: "NYSED"});
+}

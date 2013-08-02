@@ -34,8 +34,7 @@ trait BaseShell extends Logging {
         val prepped = prepareScript(sc.contents)
         val f : File = writeToFile(prepped)
         val command = cmd(dbInfo,f.getPath)
-        info("running: [" + command + "]")
-        println("running migration script : [" + sc.name + "]");
+        debug(s"running: [$command] - ${sc.name}")
         val exitCode = command ! logger
         f.delete()
         println(logger.outLog)
@@ -48,9 +47,9 @@ trait BaseShell extends Logging {
       case Nil => true
       case _ => {
 
-        println(errorResults)
+        error(errorResults)
         val msg = errorResults.map( r => r.name + "\n" + r.err + "\n" + r.out).mkString("\n")
-        println("shell exceptio: " + msg)
+        error( s"shell exception: $msg")
         throw new ShellException(msg)
       }
     }

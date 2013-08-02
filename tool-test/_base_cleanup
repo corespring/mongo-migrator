@@ -1,5 +1,0 @@
-echo "cleanup.."
-rm test-one/002_*
-rm test-one/003_*
-rm test-one/004_*
-

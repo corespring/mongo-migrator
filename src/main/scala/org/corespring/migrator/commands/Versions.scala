@@ -12,9 +12,10 @@ class Versions(uri: String) extends BaseCommand(uri) {
 
     withDb {
       db =>
+        info(s"Versions in: $uri")
         val list = Version.list
         val formatted = list.map(v => "id: " + v.id + ", versionId: " + v.versionId + " " + v.dateCreated)
-        formatted.foreach(s => println("Version: " + s))
+        formatted.foreach(s => info("Version: " + s))
     }
   }
 }

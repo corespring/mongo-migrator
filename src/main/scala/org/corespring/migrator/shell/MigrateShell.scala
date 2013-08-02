@@ -11,9 +11,7 @@ object MigrateShell extends BaseShell {
         |  throw "You need to specify an 'up' function";
         |}
         |
-        |print("running up: ");
         |up();
-        |print("done.");
       """.stripMargin
 
     contents + "\n" + template

@@ -8,8 +8,7 @@ import scala.Some
 object CLI extends App with Logging {
 
   def handleError(e: Throwable) {
-    println("An error has occured: " + e.getMessage)
-    println("see mongo-migrator.log for more details")
+    error("An error has occured: " + e.getMessage)
     error(e.getMessage, e)
     System.exit(1)
   }
@@ -48,7 +47,7 @@ object CLI extends App with Logging {
 
     val argsList = args.toList
 
-    println("Args List: " + argsList)
+    info(s"Mongo Migrator - Args ${argsList.mkString(" ")}")
 
     argsList match {
       case List() => println(Usage)

@@ -32,9 +32,9 @@ class Migrate(
             }
 
             val dbInfo = DbInfo(uri)
-            info("[Migrate] -> run shell")
+            debug("[Migrate] -> run shell")
             val successful = MigrateShell.run(dbInfo, migration.scripts)
-            info("[Migrate] -> run shell complete")
+            debug("[Migrate] -> run shell complete")
 
             if (successful)
               Version.create(Version(versionId, migration.scripts))

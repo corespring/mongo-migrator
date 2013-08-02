@@ -10,12 +10,13 @@ import org.specs2.mutable.{After, Specification}
 
 class RollbackTest extends Specification {
 
+    val testCollection: String = "test_rollback_collection"
+
   "Rollback" should {
 
     sequential
     Version.init(DbSingleton.db)
 
-    val testCollection: String = "test_rollback_collection"
 
     val oneScripts = List(Script("firstName_toName.js",
       """
@@ -133,14 +134,14 @@ class RollbackTest extends Specification {
       versionZeroDbo.get.get("firstName") === "Ed"
     }
 
+  }
+
     trait dbtidyup extends After {
       def after {
         Version.dropCollection
         DbSingleton.db(testCollection).dropCollection()
       }
     }
-  }
-
 
 }
 

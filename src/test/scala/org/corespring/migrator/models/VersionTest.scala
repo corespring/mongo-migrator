@@ -1,27 +1,17 @@
 package org.corespring.migrator.models
 
+import grizzled.slf4j.Logging
 import org.specs2.mutable.Specification
 import org.joda.time.DateTime
 import org.corespring.migrator.helpers.{DbSingleton, DbTest}
-import org.corespring.migrator.log.Logger
 import com.mongodb.casbah.MongoConnection
 import com.mongodb.casbah.MongoDB
 
-class VersionTest extends Specification {
+class VersionTest extends Specification with Logging {
 
   sequential
 
-  import Logger._
-
-  private val log = Logger.get("VersionTest")
-
   "Version" should {
-
-    "log" in {
-
-      log.info("info - 1")
-      log.fine("debug- 1")
-    }
 
     Version.init(DbSingleton.db)
 
@@ -53,15 +43,15 @@ class VersionTest extends Specification {
       create(new DateTime(), List(script("1")), s)
       create(new DateTime(), List(script("2")), s)
       create(new DateTime(), List(script("3")), s)
-      log.info(Version.allScripts(Version.currentVersion))
+      info(Version.allScripts(Version.currentVersion))
 
       Version.allScripts(Version.currentVersion).length === 3
       create(new DateTime(), List(script("4")), s)
-      log.info(Version.allScripts(Version.currentVersion))
+      info(Version.allScripts(Version.currentVersion))
 
       Version.allScripts(Version.currentVersion).length === 4
       create(new DateTime(), List(script("5")), s)
-      log.info(Version.allScripts(Version.currentVersion))
+      info(Version.allScripts(Version.currentVersion))
 
       Version.allScripts(Version.currentVersion).length === 5
     }

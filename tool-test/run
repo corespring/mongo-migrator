@@ -1,6 +1,50 @@
-#!/bin/bash
+#!/usr/bin/env ruby
 
-source "_base"
-source "_base_cleanup"
+
+def run(cmd)
+  puts "[running: #{cmd}]"
+  IO.popen(cmd) do |io|
+    while line = io.gets
+      print "|> #{line}\n" unless line.empty?
+    end
+    io.close
+    raise "An error occured" if $?.to_i != 0
+  end
+end
+
+
+puts "clean db first.."
+run "mongo tool_test_db --eval \"db.dropDatabase()\""
+
+list = Dir["../target/**/mongo-migrator*.jar"]
+JAR = list[0]
+
+puts "first run"
+run "java -jar #{JAR} migrate v1 mongodb://localhost/tool_test_db test-one"
+
+puts "copy over another script file"
+run "cp test-one-scripts/002_rename_users.js test-one/"
+
+run "java -jar #{JAR} migrate v2 mongodb://localhost/tool_test_db test-one"
+
+puts "copy over another script file"
+run "cp test-one-scripts/003_add_orgs.js test-one/"
+
+run "java -jar #{JAR} migrate v3 mongodb://localhost/tool_test_db test-one"
+
+puts "copy over another script file"
+run "cp test-one-scripts/004_rename_orgs.js test-one/"
+
+run "java -jar #{JAR} migrate v4 mongodb://localhost/tool_test_db test-one"
+
+puts "--> version"
+run "java -jar #{JAR} versions mongodb://localhost/tool_test_db"
+
+puts "cleanup.."
+run "rm test-one/002_*"
+run "rm test-one/003_*"
+run "rm test-one/004_*"
+
+
 
 

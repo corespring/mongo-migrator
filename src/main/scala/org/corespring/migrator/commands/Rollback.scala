@@ -17,7 +17,7 @@ class Rollback(
   }
 
   override def begin = {
-    println("Rollback.begin")
+    debug("Rollback.begin")
 
     withDb { db =>
 
@@ -29,7 +29,7 @@ class Rollback(
         case Some(target) => {
 
           if (target  == Version.currentVersion ){
-            println("already at current version - can't rollback")
+            warn("already at current version - can't rollback")
           } else {
 
             val laterVersions : List[Version] = Version.findVersionsLaterThan(target)
@@ -52,11 +52,11 @@ class Rollback(
             if (success){
              laterVersions.map(Version.remove(_))
             } else {
-             println("The rollback was unsuccessful!")
+             warn("The rollback was unsuccessful!")
             }
           }
         }
-        case _ => println("Can't find a version to Rollback to!")
+        case _ => warn("Can't find a version to Rollback to!")
       }
     }
   }
