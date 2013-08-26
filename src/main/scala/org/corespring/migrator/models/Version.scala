@@ -71,20 +71,11 @@ object Version {
     latest.copy(scripts = allScripts(latest))
   }
 
-  def create(v: Version): Version = {
-
-    def alreadyExists = {
-      val idCount = Dao.count(MongoDBObject("versionId" -> v.versionId))
-      idCount > 0
-    }
-
-    if (alreadyExists){
-      throw new RuntimeException("Can't create versionId: " + v.versionId + " is taken")
-    }
-
-    val newCurrent = v.copy(dateCreated = new DateTime())
-    Dao.save(newCurrent)
-    newCurrent
+  def create(v: Version): Version = Dao.findOne(MongoDBObject("versionId" -> v.versionId))
+    .getOrElse{
+      val newCurrent = v.copy(dateCreated = new DateTime())
+      Dao.save(newCurrent)
+      newCurrent
   }
 
   def count(dbo: DBObject): Long = Dao.count(dbo)

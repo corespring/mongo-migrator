@@ -11,7 +11,7 @@ object MongoMigratorBuild extends Build {
     val all = Seq(
       "org.mongodb" %% "casbah" % "2.6.2",
       "org.specs2" %% "specs2" % "2.1.1" % "test",
-      "com.novus" %% "salat" % "1.9.2-SNAPSHOT",
+      "com.novus" %% "salat" % "1.9.2",
       "org.clapper" % "grizzled-slf4j_2.10" % "1.0.1",
       "ch.qos.logback" % "logback-classic" % "1.0.3"
       )
