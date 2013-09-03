@@ -1,6 +1,6 @@
 sbt test
 sbt one-jar
-cp target/scala-2.9.2/mongo-migrator_2.9.2-0.1-SNAPSHOT-one-jar.jar bin/mongo-migrator-0.1.jar
+cp target/scala-2.10/mongo-migrator_2.10-0.2.1-one-jar.jar bin/mongo-migrator-0.2.1.jar
 #TODO
 #cd tool-test
 #./run
