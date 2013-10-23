@@ -1,9 +1,8 @@
 import sbt._
 import sbt.Keys._
 import sbtassembly.Plugin._
-import com.github.retronym.SbtOneJar
 
-object MongoMigratorBuild extends Build {
+object Build extends sbt.Build {
 
 
   object Dependencies{
@@ -34,10 +33,10 @@ object MongoMigratorBuild extends Build {
   lazy val mongoMigrator = Project(
     id = "mongo-migrator",
     base = file("."),
-    settings = Project.defaultSettings ++ assemblySettings ++ SbtOneJar.oneJarSettings ++ Seq(
+    settings = Project.defaultSettings ++ assemblySettings ++ Seq(
       name := "mongo-migrator",
       organization := "org.corespring",
-      version := "0.2.1",
+      version := "0.2.2",
       scalaVersion := "2.10.2",
       libraryDependencies ++= Dependencies.all,
       resolvers ++= Resolvers.all,

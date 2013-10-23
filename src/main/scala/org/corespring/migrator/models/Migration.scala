@@ -1,6 +1,6 @@
 package org.corespring.migrator.models
 
-import org.corespring.migrator.exceptions.MigrationException
+import org.corespring.migrator.exceptions.NonContiguousMigrationException
 
 case class Migration(scripts: Seq[Script])
 
@@ -27,12 +27,15 @@ object Migration {
           val currentSorted: Seq[Script] = currentVersion.scripts.sortWith(_.name < _.name)
           val newSorted: Seq[Script] = scripts.sortWith(_.name < _.name)
 
-          val difference = newSorted.filterNot( currentSorted.contains(_) )
+          def isExistingScript(n:Script) : Boolean = currentSorted.exists( currentScript => currentScript.name == n.name)
+
+          val difference = newSorted.filterNot(isExistingScript)
+
           difference match {
             case List() => List()
             case head :: rest => {
               def contiguous = newSorted.indexOf(head) == currentSorted.length
-              if (contiguous) difference else throw new MigrationException(currentSorted, newSorted)
+              if (contiguous) difference else throw new NonContiguousMigrationException(currentSorted, newSorted)
             }
           }
         }
