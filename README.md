@@ -97,7 +97,7 @@ Publishing/Hosting is do be done..
 ## Developing
 you'll need to have sbt installed.
  
-    sbt one-jar # to build a one-jar:
+    sbt assembly # to build an all in one jar
     sbt compile # to compile
      
 
@@ -113,7 +113,7 @@ https://github.com/edeustace/mongo-db-utils/tree/master/integration-test-env
 
 
 ### Release Notes:
-
+- 0.2.2 : Fixed issue where Script equality wasn't working correctly.
 - 0.2 : Added support for replica sets
 - 0.1 : First version
 
