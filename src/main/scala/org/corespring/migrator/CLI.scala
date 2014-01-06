@@ -1,7 +1,7 @@
 package org.corespring.migrator.migrator
 
 import grizzled.slf4j.Logging
-import org.corespring.migrator.commands.{BaseCommand,ScriptValidator,Versions,Synch,Migrate,Rollback}
+import org.corespring.migrator.commands._
 import org.corespring.migrator.models.DbInfo
 import scala.Some
 
@@ -41,6 +41,7 @@ object CLI extends App with Logging {
     val Rollback = "rollback"
     val Versions = "versions"
     val Synch = "synch"
+    val LogTest = "log-test"
   }
 
   try {
@@ -55,6 +56,10 @@ object CLI extends App with Logging {
 
         def cmd: Option[BaseCommand] = {
           action match {
+
+            case Actions.LogTest => {
+              Some(LogTest())
+            }
             case Actions.Migrate => {
               params match {
                 case versionId :: mongoUri :: scripts => {

@@ -1,6 +1,7 @@
 import sbt._
 import sbt.Keys._
 import sbtassembly.Plugin._
+import sbtrelease.ReleasePlugin._
 
 object Build extends sbt.Build {
 
@@ -33,11 +34,10 @@ object Build extends sbt.Build {
   lazy val mongoMigrator = Project(
     id = "mongo-migrator",
     base = file("."),
-    settings = Project.defaultSettings ++ assemblySettings ++ Seq(
+    settings = Project.defaultSettings ++ assemblySettings  ++ releaseSettings ++ Seq(
       name := "mongo-migrator",
       organization := "org.corespring",
-      version := "0.2.2",
-      scalaVersion := "2.10.2",
+      scalaVersion := "2.10.3",
       libraryDependencies ++= Dependencies.all,
       resolvers ++= Resolvers.all,
       //because of all the db testing we need - only test serially

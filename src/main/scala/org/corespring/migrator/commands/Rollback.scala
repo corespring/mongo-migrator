@@ -7,7 +7,7 @@ class Rollback(
                targetId:String,
                uri:String,
                scriptPaths:List[String],
-               validateContents : (Seq[Script], List[String]) => Boolean) extends BaseCommand(uri){
+               validateContents : (Seq[Script], List[String]) => Boolean) extends BaseDBCommand(uri){
 
 
 

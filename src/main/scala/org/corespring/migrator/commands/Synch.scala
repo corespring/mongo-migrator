@@ -6,7 +6,7 @@ import java.io.{FileWriter, File}
 class Synch(target: String,
             versionId: String,
             uri: String,
-            scriptPaths: Seq[String]) extends BaseCommand(uri) {
+            scriptPaths: Seq[String]) extends BaseDBCommand(uri) {
 
   def begin() {
     withDb {

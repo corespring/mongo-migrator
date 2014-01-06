@@ -6,7 +6,7 @@ import org.corespring.migrator.models.Version
   *
   * @param uri
   */
-class Versions(uri: String) extends BaseCommand(uri) {
+class Versions(uri: String) extends BaseDBCommand(uri) {
 
   override def begin {
 

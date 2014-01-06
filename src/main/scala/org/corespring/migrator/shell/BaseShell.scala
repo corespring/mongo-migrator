@@ -26,7 +26,6 @@ trait BaseShell extends Logging {
       fw.close()
       new File(shellFile)
     }
-
     val cmdResults : Seq[CmdResult] = scripts.map {
       sc =>
         import scala.sys.process._
@@ -37,7 +36,13 @@ trait BaseShell extends Logging {
         debug(s"running: [$command] - ${sc.name}")
         val exitCode = command ! logger
         f.delete()
-        println(logger.outLog)
+        debug(sc.name)
+        debug(logger.outLog)
+
+        if(exitCode != 0){
+          throw new ShellException(s"${sc.name}\n${logger.errorLog}\n${logger.outLog}")
+        }
+
         CmdResult(sc.name, logger.outLog, logger.errorLog, exitCode)
     }
 

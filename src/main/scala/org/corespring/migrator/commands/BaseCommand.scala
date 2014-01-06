@@ -4,19 +4,22 @@ import com.mongodb.casbah.MongoDB
 import grizzled.slf4j.Logging
 import org.corespring.migrator.models.{DbHelper, Version}
 
+trait BaseCommand extends Logging {
+  def begin() : Unit
 
-abstract class BaseCommand(uri: String) extends Logging {
+  def cleanup() : Unit
+}
+
+abstract class BaseDBCommand(uri: String) extends BaseCommand {
 
   lazy val helper : DbHelper = new DbHelper(uri)
-
-  def begin()
 
   protected def withDb(fn: (MongoDB => Unit)) {
     Version.init(helper.mongoDB)
     fn(helper.mongoDB)
   }
 
-  def cleanup : Unit = {
+  override def cleanup : Unit = {
     debug("closing connection: " + helper.connection)
     helper.connection.close()
   }

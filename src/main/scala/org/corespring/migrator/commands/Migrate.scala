@@ -10,7 +10,7 @@ class Migrate(
                uri: String,
                scriptFolders: List[String],
                versionId: String,
-               validateContents: (Seq[Script], List[String]) => Boolean) extends BaseCommand(uri) {
+               validateContents: (Seq[Script], List[String]) => Boolean) extends BaseDBCommand(uri) {
 
   override def begin() {
     withDb {
