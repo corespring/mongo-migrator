@@ -5,7 +5,7 @@ import sbtrelease.ReleasePlugin._
 
 object Build extends sbt.Build {
 
-  (credentials in ThisBuild) += {
+  val cred = {
     val envCredentialsPath = System.getenv("CREDENTIALS_PATH")
     val path = if (envCredentialsPath != null) envCredentialsPath else Seq(Path.userHome / ".ivy2" / ".credentials").mkString
     val f: File = file(path)
@@ -68,7 +68,8 @@ object Build extends sbt.Build {
         val repoType = if (isSnapshot) "snapshot" else "release"
         val finalPath = base + "/ivy-" + repoType + "s"
         Some("Artifactory Realm" at finalPath)
-      }
+      },
+      credentials += cred
     )
   )
 }
