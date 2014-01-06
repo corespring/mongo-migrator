@@ -21,9 +21,8 @@ object Build extends sbt.Build {
     }
   }
 
-  publishTo in ThisBuild <<= version {
-    (v: String) =>
-      def isSnapshot = v.trim.contains("-")
+  (publishTo in ThisBuild) := {
+      def isSnapshot = version.value.trim.contains("-")
       val base = "http://repository.corespring.org/artifactory"
       val repoType = if (isSnapshot) "snapshot" else "release"
       val finalPath = base + "/ivy-" + repoType + "s"
